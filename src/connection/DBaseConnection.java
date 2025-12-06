@@ -19,7 +19,7 @@ import java.sql.SQLException;
         try {
             // URL database, nama pengguna, dan kata sandi
            // String url = "jdbc:mysql://localhost:3306/apotek";
-            String url = "jdbc:mysql://localhost:3306/akademik";
+            String url = "jdbc:mysql://localhost:3306/clandys";
             String user = "root";
             String password = "";
 

@@ -87,6 +87,11 @@ public class FormLogin extends javax.swing.JFrame {
         PasswordLabel.setText("Password");
 
         btnLogin.setText("Log In");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -143,6 +148,21 @@ public class FormLogin extends javax.swing.JFrame {
     private void UsernameLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernameLoginActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_UsernameLoginActionPerformed
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        // TODO add your handling code here:
+        // 1. Ambil teks yang diketik user
+        String user = UsernameLogin.getText();
+        String pass = PasswordLogin.getText();
+
+        if (user.isEmpty() || pass.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Username dan Password tidak boleh kosong!");
+        } 
+        else {
+            controller.loginController login = new controller.loginController();
+            login.cekLogin(user, pass, this);
+        }
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments
