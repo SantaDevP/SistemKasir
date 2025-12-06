@@ -8,6 +8,6 @@ package controller;
  *
  * @author LENOVO
  */
-public class CheckStockController {
+public class classcontroll {
     
 }
