@@ -1,111 +1,110 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
+
 import connection.DBaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.JOptionPane;
+import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import model.transaksi; // Pastikan model ini ada
+import model.detailTransaksi; // Pastikan model ini ada
 
 public class TransaksiController {
-    
-    // 1. FUNGSI MENCARI BARANG (Saat Kasir Scan/Ketik ID)
-    // Mengembalikan array string: [Nama, Harga, Stok]
-    public String[] cariBarang(String idBarang) {
-        String[] data = new String[3]; // Nampung Nama, Harga, Stok
+
+    // 1. METHOD GENERATE NOMOR TRANSAKSI OTOMATIS
+    public String getNoTransaksiOtomatis() {
+        String idBaru = "TRX-001"; // Default jika database kosong
         Connection con = DBaseConnection.connect();
         
         try {
-            String sql = "SELECT * FROM barang WHERE id_barang = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, idBarang);
-            ResultSet rs = ps.executeQuery();
+            Statement st = con.createStatement();
+            // Ambil id terakhir, urutkan dari terbesar
+            String sql = "SELECT id_transaksi FROM transaksi ORDER BY id_transaksi DESC LIMIT 1";
+            ResultSet rs = st.executeQuery(sql);
             
             if (rs.next()) {
-                data[0] = rs.getString("nama_barang");
-                data[1] = rs.getString("harga");
-                data[2] = rs.getString("stok");
-            } else {
-                return null; // Barang tidak ditemukan
+                // Misal data terakhir: TRX-005
+                String idTerakhir = rs.getString("id_transaksi");
+                
+                // Ambil angkanya saja (hapus "TRX-" di 4 karakter awal) -> "005"
+                // Ubah jadi integer -> 5
+                int angka = Integer.parseInt(idTerakhir.substring(4));
+                
+                // Tambah 1 -> 6
+                angka++;
+                
+                // Format ulang jadi String dengan 3 digit (006) -> TRX-006
+                idBaru = "TRX-" + String.format("%03d", angka);
             }
-            
         } catch (Exception e) {
-            System.out.println("Error Cari Barang: " + e.getMessage());
+            System.out.println("Error Auto Number: " + e.getMessage());
         }
-        return data;
+        return idBaru;
     }
 
-    // 2. FUNGSI UTAMA: PROSES PEMBAYARAN
-    public void simpanTransaksi(String idTrans, int totalBayar, int idPegawai, JTable tabelKeranjang) {
+    // 2. METHOD SIMPAN TRANSAKSI
+    public boolean simpanTransaksi(transaksi t, ArrayList<detailTransaksi> listDetail) {
         Connection con = DBaseConnection.connect();
-        
         try {
-            // PENTING: Matikan auto-save agar bisa dibatalkan jika ada error di tengah jalan
+            // Matikan auto-commit agar data tersimpan sekaligus (header + detail)
             con.setAutoCommit(false); 
             
-            // A. Simpan ke Tabel TRANSAKSI (Header Struk)
-            String tanggalSekarang = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            String sqlTrans = "INSERT INTO transaksi (id_transaksi, tgl_transaksi, total_harga, id_pegawai) VALUES (?, ?, ?, ?)";
+            // A. SIMPAN HEADER TRANSAKSI
+            // Sesuaikan dengan kolom di clandys.sql: id_transaksi, tgl_transaksi, id_pegawai, id_customer, total_belanja
+            String sqlTrans = "INSERT INTO transaksi (id_transaksi, tgl_transaksi, id_pegawai, id_customer, total_belanja) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement psTrans = con.prepareStatement(sqlTrans);
-            psTrans.setString(1, idTrans);
-            psTrans.setString(2, tanggalSekarang);
-            psTrans.setInt(3, totalBayar);
-            psTrans.setInt(4, idPegawai);
+            
+            // Tanggal harus format yyyy-MM-dd HH:mm:ss untuk MySQL DATETIME
+            // Asumsi t.getTgl_transaksi() masih String dari JDateChooser yang sudah diformat di View, 
+            // ATAU kita format ulang disini biar aman:
+            String tglDB = t.getTgl_transaksi(); 
+            
+            psTrans.setString(1, t.getId_transaksi());
+            psTrans.setString(2, tglDB);
+            psTrans.setInt(3, t.getId_pegawai());
+            psTrans.setInt(4, t.getId_customer());
+            psTrans.setDouble(5, t.getTotal_belanja());
             psTrans.executeUpdate();
             
-            // B. Simpan Detail Barang & Kurangi Stok (Looping baris tabel)
-            String sqlDetail = "INSERT INTO detail_transaksi (id_transaksi, id_barang, jumlah, subtotal) VALUES (?, ?, ?, ?)";
-            String sqlUpdateStok = "UPDATE barang SET stok = stok - ? WHERE id_barang = ?";
+            // B. SIMPAN DETAIL & UPDATE STOK
+            String sqlDetail = "INSERT INTO detail_transaksi (id_transaksi, id_product, quantity, subtotal) VALUES (?, ?, ?, ?)";
+            String sqlStok = "UPDATE product SET stok = stok - ? WHERE id_product = ?";
             
             PreparedStatement psDetail = con.prepareStatement(sqlDetail);
-            PreparedStatement psStok = con.prepareStatement(sqlUpdateStok);
+            PreparedStatement psStok = con.prepareStatement(sqlStok);
             
-            DefaultTableModel model = (DefaultTableModel) tabelKeranjang.getModel();
-            
-            // Loop semua baris di keranjang belanja
-            for (int i = 0; i < model.getRowCount(); i++) {
-                String idBarang = model.getValueAt(i, 0).toString(); // Kolom 0: ID Barang
-                int harga = Integer.parseInt(model.getValueAt(i, 2).toString()); // Kolom 2: Harga
-                int qty = Integer.parseInt(model.getValueAt(i, 3).toString());   // Kolom 3: Jumlah
-                int subtotal = harga * qty;
+            for (detailTransaksi d : listDetail) {
+                // Masukkan Detail
+                psDetail.setString(1, t.getId_transaksi());
+                psDetail.setInt(2, d.getId_product());
+                psDetail.setInt(3, d.getQuantity());
+                psDetail.setDouble(4, d.getSubtotal());
+                psDetail.executeUpdate(); // Eksekusi per baris barang
                 
-                // 1. Masukkan ke detail_transaksi
-                psDetail.setString(1, idTrans);
-                psDetail.setString(2, idBarang);
-                psDetail.setInt(3, qty);
-                psDetail.setInt(4, subtotal);
-                psDetail.executeUpdate();
-                
-                // 2. Kurangi Stok di tabel barang
-                psStok.setInt(1, qty);
-                psStok.setString(2, idBarang);
+                // Kurangi Stok Barang
+                psStok.setInt(1, d.getQuantity());
+                psStok.setInt(2, d.getId_product());
                 psStok.executeUpdate();
             }
             
-            // Jika semua lancar, SIMPAN PERMANEN
+            // Jika sampai sini lancar, simpan permanen
             con.commit();
-            con.setAutoCommit(true); // Kembalikan ke normal
-            JOptionPane.showMessageDialog(null, "Transaksi Berhasil Disimpan!");
-            
-            // Kosongkan tabel keranjang setelah sukses
-            model.setRowCount(0);
+            con.setAutoCommit(true);
+            return true;
             
         } catch (Exception e) {
             try {
-                con.rollback(); // BATALKAN SEMUA jika ada error
-                System.out.println("Transaksi Dibatalkan: " + e.getMessage());
-                JOptionPane.showMessageDialog(null, "Gagal Transaksi! Stok dikembalikan.");
-            } catch (SQLException ex) {
-                System.out.println("Rollback gagal");
-            }
+                con.rollback(); // Batalkan semua jika ada error di tengah
+                System.out.println("Rollback dilakukan.");
+            } catch (SQLException ex) {}
+            
+            System.out.println("Error Simpan Transaksi: " + e.getMessage());
+            return false;
         }
     }
-    
 }
