@@ -14,12 +14,16 @@ public class supplier {
     private String nama_supplier;
     private String alamat;
     private String telp;
+    private String Kategori;
+    private String email_supplier;
 
     public supplier(int id_supplier, String nama_supplier, String alamat, String telp) {
         this.id_supplier = id_supplier;
         this.nama_supplier = nama_supplier;
         this.alamat = alamat;
         this.telp = telp;
+        this.Kategori = Kategori;
+        this.email_supplier = email_supplier;
     }
 
     public supplier() {
@@ -58,5 +62,19 @@ public class supplier {
         this.telp = telp;
     }
     
+     public String getKategori() {
+        return Kategori;
+    }
+
+    public void setKategori(String Kategori) {
+        this.Kategori = Kategori;
+    }
     
+     public String getemail_supplier() {
+        return email_supplier;
+    }
+
+    public void setemail_supplier(String email) {
+        this.email_supplier = email;
+    }
 }
