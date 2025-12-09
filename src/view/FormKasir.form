@@ -57,7 +57,7 @@
                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="tanggal" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="412" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="410" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="selesai" min="-2" pref="49" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
@@ -368,7 +368,6 @@
                       <Group type="102" attributes="0">
                           <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="noTransaksi" min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="kodeBarang" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -376,7 +375,10 @@
                               <Group type="102" attributes="0">
                                   <EmptySpace min="3" pref="3" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="noTransaksi" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
