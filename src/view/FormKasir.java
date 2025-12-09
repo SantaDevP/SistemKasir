@@ -61,10 +61,9 @@ public class FormKasir extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         namaKasir = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
-        cekStok = new javax.swing.JButton();
+        inventory = new javax.swing.JButton();
         generateLaporan = new javax.swing.JButton();
         akhirHari = new javax.swing.JButton();
-        tambahStock = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         tanggal = new javax.swing.JPanel();
@@ -73,7 +72,6 @@ public class FormKasir extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         pelanggan = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        tglTransaksi = new com.toedter.calendar.JDateChooser();
         jLabel4 = new javax.swing.JLabel();
         kodeBarang = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -88,6 +86,7 @@ public class FormKasir extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         kembalian = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        tglTransaksi = new com.toedter.calendar.JDateChooser();
         selesai = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -130,15 +129,18 @@ public class FormKasir extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(204, 204, 204));
 
-        cekStok.setText("Check Stock");
+        inventory.setText("Inventory");
+        inventory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inventoryActionPerformed(evt);
+            }
+        });
 
         generateLaporan.setText("Generate Laporan");
 
         akhirHari.setBackground(new java.awt.Color(102, 0, 0));
         akhirHari.setForeground(new java.awt.Color(255, 255, 255));
         akhirHari.setText("End Day");
-
-        tambahStock.setText("Tambah Stock");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -147,19 +149,16 @@ public class FormKasir extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cekStok, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(inventory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(generateLaporan, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
-                    .addComponent(akhirHari, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
-                    .addComponent(tambahStock, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(akhirHari, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap(9, Short.MAX_VALUE)
-                .addComponent(tambahStock)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cekStok)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(inventory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(generateLaporan)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -228,9 +227,6 @@ public class FormKasir extends javax.swing.JFrame {
         });
 
         jLabel3.setText("Tanggal");
-
-        tglTransaksi.setBackground(new java.awt.Color(255, 255, 255));
-        tglTransaksi.setForeground(new java.awt.Color(255, 255, 255));
 
         jLabel4.setText("Kode Barang");
 
@@ -303,22 +299,6 @@ public class FormKasir extends javax.swing.JFrame {
                 .addGap(87, 87, 87)
                 .addGroup(tanggalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tanggalLayout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(tglTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(kuantitas, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tanggalLayout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(pelanggan, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(namaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tanggalLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
                         .addComponent(noTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -327,7 +307,27 @@ public class FormKasir extends javax.swing.JFrame {
                         .addGap(12, 12, 12)
                         .addComponent(kodeBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tanggalLayout.createSequentialGroup()
+                        .addGroup(tanggalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, tanggalLayout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tglTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, tanggalLayout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(pelanggan, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(28, 28, 28)
+                        .addGroup(tanggalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tanggalLayout.createSequentialGroup()
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(12, 12, 12)
+                                .addComponent(namaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tanggalLayout.createSequentialGroup()
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(12, 12, 12)
+                                .addComponent(kuantitas, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(19, 19, 19)
                 .addGroup(tanggalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tanggalLayout.createSequentialGroup()
@@ -387,14 +387,14 @@ public class FormKasir extends javax.swing.JFrame {
                 .addGap(12, 12, 12)
                 .addGroup(tanggalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(tglTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tanggalLayout.createSequentialGroup()
                         .addGap(3, 3, 3)
                         .addComponent(jLabel6))
                     .addComponent(kuantitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tambahkan)
                     .addComponent(reset)
-                    .addComponent(proses)))
+                    .addComponent(proses)
+                    .addComponent(tglTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         selesai.setBackground(new java.awt.Color(0, 102, 51));
@@ -649,6 +649,10 @@ public class FormKasir extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_namaKasirActionPerformed
 
+    private void inventoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inventoryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_inventoryActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -687,8 +691,8 @@ public class FormKasir extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton akhirHari;
     private javax.swing.JTextField bayar;
-    private javax.swing.JButton cekStok;
     private javax.swing.JButton generateLaporan;
+    private javax.swing.JButton inventory;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -715,7 +719,6 @@ public class FormKasir extends javax.swing.JFrame {
     private javax.swing.JButton reset;
     private javax.swing.JButton selesai;
     private javax.swing.JTable table;
-    private javax.swing.JButton tambahStock;
     private javax.swing.JButton tambahkan;
     private javax.swing.JPanel tanggal;
     private com.toedter.calendar.JDateChooser tglTransaksi;
