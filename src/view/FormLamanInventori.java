@@ -22,6 +22,11 @@ public class FormLamanInventori extends javax.swing.JFrame {
      */
     public FormLamanInventori() {
         initComponents();
+        // 1. Panggil Controller
+    controller.InventoryController inv = new controller.InventoryController();
+    
+    // 2. Perintahkan untuk mengisi tabel saat aplikasi baru dibuka
+    inv.tampilkanData(jTable1);
         this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
     }
 
@@ -57,6 +62,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
         BtnTambah = new javax.swing.JButton();
         BtnEditJual = new javax.swing.JButton();
         BtnEditBeli = new javax.swing.JButton();
+        BtnMultiItem = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1000, 669));
@@ -193,6 +199,13 @@ public class FormLamanInventori extends javax.swing.JFrame {
             }
         });
 
+        BtnMultiItem.setText("MultiItem");
+        BtnMultiItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnMultiItemActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -245,7 +258,10 @@ public class FormLamanInventori extends javax.swing.JFrame {
                                         .addComponent(TambahStock, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(BtnTambah)
                                     .addComponent(BtnEditJual, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(BtnEditBeli, javax.swing.GroupLayout.Alignment.LEADING))))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(BtnEditBeli)
+                                        .addGap(40, 40, 40)
+                                        .addComponent(BtnMultiItem)))))
                         .addGap(0, 401, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -278,7 +294,8 @@ public class FormLamanInventori extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(HargaBeli, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BtnEditBeli))
+                    .addComponent(BtnEditBeli)
+                    .addComponent(BtnMultiItem))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -354,40 +371,53 @@ public class FormLamanInventori extends javax.swing.JFrame {
     }//GEN-LAST:event_TambahStockActionPerformed
 
     private void BtnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTambahActionPerformed
-// 1. Validasi Input Kosong
-    if (KodeBarang.getText().isEmpty() || NamaBarang.getText().isEmpty() || HargaBeli.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Lengkapi data barang baru!");
+// 1. Validasi
+    if (KodeBarang.getText().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang dulu (Cari)!");
+        return;
+    }
+    
+    if (TambahStock.getText().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Isi jumlah stok yang mau ditambah!");
+        TambahStock.requestFocus();
         return;
     }
 
     try {
-        // 2. Ambil Data dari Form
         String id = KodeBarang.getText();
-        String nama = NamaBarang.getText();
-        String kategori = Kategori.getText();
-        
+        int tambahanStok = Integer.parseInt(TambahStock.getText());
         int hgBeli = Integer.parseInt(HargaBeli.getText());
         int hgJual = Integer.parseInt(HargaJual.getText());
-        
-        // Ambil stok awal dari kolom Tambah Stok (Jika kosong anggap 0)
-        int StokAwal = 0;
-        if (TambahStock.getText().isEmpty()) {
-            StokAwal = Integer.parseInt(TambahStock.getText());
-        }
 
-        // 3. Panggil Controller Simpan Baru
+        // 2. Update Database
         controller.InventoryController inv = new controller.InventoryController();
-        inv.simpanBarangBaru(id, nama, kategori, hgBeli, hgJual, StokAwal);
+        inv.updateStokDanHarga(id, tambahanStok, hgBeli, hgJual);
 
-        // 4. Refresh & Reset
-        inv.tampilkanData(jTable1);
+        // --- FITUR ANTI DUPLIKAT (Supaya Tabel Rapi) ---
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
         
-       BtnResetActionPerformed(evt);
-    
+        // Cek satu per satu baris yang ada di tabel
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String idDiTabel = model.getValueAt(i, 0).toString();
+            
+            // Jika ketemu ID yang sama...
+            if (idDiTabel.equals(id)) {
+                model.removeRow(i); // ...Hapus baris lama tersebut!
+                break; // Berhenti mencari karena sudah dihapus
+            }
+        }
+        // -----------------------------------------------
+
+        // 3. Masukkan Data Terbaru (Otomatis muncul di paling bawah)
+        inv.tambahBarisTabel(jTable1, id);
+
+        // 4. Bersihkan Input Stok
+        TambahStock.setText("");
         
     } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka!");
-    }        // TODO add your handling code here:
+        javax.swing.JOptionPane.showMessageDialog(this, "Kolom Stok/Harga harus angka!");
+    
+    }
     }//GEN-LAST:event_BtnTambahActionPerformed
 
     private void BtnEditJualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEditJualActionPerformed
@@ -410,35 +440,56 @@ public class FormLamanInventori extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnEditBeliActionPerformed
 
     private void BtnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCariActionPerformed
-        String id = KodeBarang.getText();
+    // 1. Ambil ID yang Anda ketik
+    String id = KodeBarang.getText(); 
     
-    controller.InventoryController inv = new controller.InventoryController();
-    String[] data = inv.cariDetailProduct(id); // Pastikan nama method di controller 'cariDetailProduct'
+    // CEK: Kalau ID kosong, jangan cari (biar ga error)
+    if (id.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Isi Kode Barang dulu!");
+        return;
+    }
 
+    // 2. Panggil Controller
+    controller.InventoryController inv = new controller.InventoryController();
+    String[] data = inv.cariDetailProduct(id);
+
+    // 3. Cek Hasil Pencarian
     if (data != null) {
-        // 1. Isi Data ke Textfield
+        // --- ISI FORM (Data ditemukan) ---
         NamaBarang.setText(data[0]);
         Kategori.setText(data[1]);
         HargaBeli.setText(data[2]);
         HargaJual.setText(data[3]);
         
-        // 2. Kunci Textfield agar tidak tidak sengaja terubah
-        // (User harus klik tombol 'Edit' kecil dulu kalau mau ubah harga)
+        // --- BAGIAN KUNCI (Supaya Aman) ---
+        // Kunci textfield biar user gak asal edit nama/kategori
         NamaBarang.setEditable(false);
         Kategori.setEditable(false);
         HargaBeli.setEditable(false); 
         HargaJual.setEditable(false);
         
-        // 3. Persiapan Input Stok
+        // Kosongkan HANYA kolom Tambah Stock (Bukan Kode Barang!)
         TambahStock.setText(""); 
-        TambahStock.requestFocus(); // Kursor pindah ke sini
+        
+        // Fokuskan kursor ke Tambah Stock biar enak ngetik
+        TambahStock.requestFocus();
+        
+        // Tampilkan hanya barang ini di tabel
+        inv.filterTable(jTable1, id);
         
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, "Barang tidak ditemukan!");
-    }// TODO add your handling code here:
+        // Jika tidak ketemu, kosongkan nama dkk (Tapi Kode Barang JANGAN dihapus)
+        NamaBarang.setText("");
+        Kategori.setText("");
+        HargaBeli.setText("");
+        HargaJual.setText("");
+        TambahStock.setText("");
+    }
     }//GEN-LAST:event_BtnCariActionPerformed
 
     private void BtnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnResetActionPerformed
+    // 1. Bersihkan Textfield
     KodeBarang.setText("");
     NamaBarang.setText("");
     Kategori.setText("");
@@ -446,13 +497,78 @@ public class FormLamanInventori extends javax.swing.JFrame {
     HargaJual.setText("");
     TambahStock.setText("");
     
-    // Kembalikan textfield jadi bisa diketik (atau dikunci, terserah Anda)
-    KodeBarang.requestFocus();    // TODO add your handling code here:
+    // 2. BUKA KUNCI (Supaya bisa ketik Barang Baru) --- [INI YANG PENTING]
+    NamaBarang.setEditable(true);
+    Kategori.setEditable(true);
+    HargaBeli.setEditable(true);
+    HargaJual.setEditable(true);
+    // ---------------------------------------------------------------------
+    
+    // 3. Bersihkan Tabel (Sesuai request sebelumnya)
+    try {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); 
+    } catch (Exception e) {
+    }
+    
+    // 4. Fokus kembali ke Kode Barang
+    KodeBarang.requestFocus();
     }//GEN-LAST:event_BtnResetActionPerformed
 
     private void BtnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnKembaliActionPerformed
-    this.dispose();   // TODO add your handling code here:
+    this.dispose();// TODO add your handling code here:
     }//GEN-LAST:event_BtnKembaliActionPerformed
+
+    private void BtnMultiItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnMultiItemActionPerformed
+                                             
+    // 1. VALIDASI: Pastikan sudah Cari Barang & Isi Stok
+    if (KodeBarang.getText().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Cari barang dulu sebelum dimasukkan ke tabel!");
+        return;
+    }
+    if (TambahStock.getText().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Isi jumlah stok yang mau ditambah!");
+        TambahStock.requestFocus();
+        return;
+    }
+
+    try {
+        // 2. AMBIL DATA DARI FORM
+        String id = KodeBarang.getText();
+        int tambahanStok = Integer.parseInt(TambahStock.getText());
+        int hgBeli = Integer.parseInt(HargaBeli.getText());
+        int hgJual = Integer.parseInt(HargaJual.getText());
+
+        // 3. UPDATE DATABASE (Stok Bertambah)
+        controller.InventoryController inv = new controller.InventoryController();
+        inv.updateStokDanHarga(id, tambahanStok, hgBeli, hgJual);
+
+        // 4. LOGIKA KERANJANG (ANTI DUPLIKAT)
+        // Kita cek tabel: Kalau barang ini sudah ada di tabel, hapus baris lamanya.
+        // Supaya tidak ada 2 baris "Mouse" yang sama.
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String idDiTabel = model.getValueAt(i, 0).toString(); // Ambil ID di kolom pertama
+            if (idDiTabel.equals(id)) {
+                model.removeRow(i); // Hapus baris lama
+                break; // Stop looping karena sudah ketemu
+            }
+        }
+
+        // 5. MASUKKAN DATA TERBARU (Tempel di Paling Bawah)
+        inv.tambahBarisTabel(jTable1, id);
+
+        // 6. BERSIHKAN INPUT (Siap untuk barang selanjutnya)
+        TambahStock.setText("");     // Kosongkan stok
+        KodeBarang.setText("");      // Kosongkan kode (opsional, biar user tau proses selesai)
+        NamaBarang.setText("");      // Bersihkan nama juga biar rapi
+        KodeBarang.requestFocus();   // Kursor balik ke Kode Barang (Siap Scan/Ketik lagi)
+        
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Kolom Stok harus angka!");
+    }
+    }//GEN-LAST:event_BtnMultiItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -484,6 +600,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
     private javax.swing.JButton BtnEditBeli;
     private javax.swing.JButton BtnEditJual;
     private javax.swing.JButton BtnKembali;
+    private javax.swing.JButton BtnMultiItem;
     private javax.swing.JButton BtnReset;
     private javax.swing.JButton BtnSimpan;
     private javax.swing.JButton BtnTambah;
