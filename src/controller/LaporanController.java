@@ -4,72 +4,101 @@
  */
 package controller;
 import connection.DBaseConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import javax.swing.JLabel;
+import java.sql.*;
+import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import com.toedter.calendar.JDateChooser;
 /**
  *
  * @author LENOVO
  */
 public class LaporanController {
-    public void filterLaporan(JTable tabel, JLabel lblOmzet, String tglMulai, String tglSampai) {
-        Connection con = DBaseConnection.connect();
-        DefaultTableModel model = new DefaultTableModel();
+    public void tampilkanLaporan(JDateChooser tglMulai, JDateChooser tglAkhir, JTable tabel, JTextField txtOmset, JTextField txtKeuntungan) {
         
-        // Judul Kolom Laporan
-        model.addColumn("ID Transaksi");
-        model.addColumn("Tanggal");
-        model.addColumn("Nama Kasir"); // Kita akan JOIN dengan tabel pegawai
-        model.addColumn("Total Belanja");
+        // 1. Validasi: Pastikan tanggal sudah dipilih
+        if (tglMulai.getDate() == null || tglAkhir.getDate() == null) {
+            JOptionPane.showMessageDialog(null, "Harap pilih rentang tanggal mulai dan akhir!");
+            return;
+        }
+        
+        // 2. Persiapan Koneksi & Tabel
+        Connection con = DBaseConnection.connect();
+        DefaultTableModel model = (DefaultTableModel) tabel.getModel();
+        model.setRowCount(0); // Bersihkan tabel lama
+        
+        // 3. Format Tanggal untuk Query MySQL (yyyy-MM-dd)
+        // Kita tambah jam 00:00:00 dan 23:59:59 agar mencakup seluruh hari itu
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String mulai = sdf.format(tglMulai.getDate()) + " 00:00:00";
+        String akhir = sdf.format(tglAkhir.getDate()) + " 23:59:59";
+
+        // Variabel penampung total
+        double totalOmset = 0;
+        double totalModal = 0;
 
         try {
-            // Query JOIN: Mengambil nama pegawai dari tabel pegawai berdasarkan ID di tabel transaksi
-            String sql = "SELECT t.id_transaksi, t.tgl_transaksi, p.nama_pegawai, t.total_harga " +
-                         "FROM transaksi t " +
-                         "JOIN pegawai p ON t.id_pegawai = p.id_pegawai " +
-                         "WHERE t.tgl_transaksi BETWEEN ? AND ?";
-            
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, tglMulai); // Format: yyyy-MM-dd
-            ps.setString(2, tglSampai);
-            
-            ResultSet rs = ps.executeQuery();
-            
-            int totalOmzet = 0;
+            // 4. QUERY SQL (LOGIKA UTAMA)
+            // Menggabungkan data penjualan dengan data modal barang
+            String sql = "SELECT p.nama_product, p.id_product, "
+                       + "SUM(dt.quantity) as qty_terjual, "
+                       + "p.harga_beli, "
+                       + "p.harga_jual, "
+                       + "SUM(dt.subtotal) as total_jual, " // Omzet per item (Harga Jual x Qty)
+                       + "SUM(dt.quantity * p.harga_beli) as total_modal " // Modal per item (Harga Beli x Qty)
+                       + "FROM detail_transaksi dt "
+                       + "JOIN transaksi t ON dt.id_transaksi = t.id_transaksi "
+                       + "JOIN product p ON dt.id_product = p.id_product "
+                       + "WHERE t.tgl_transaksi BETWEEN '" + mulai + "' AND '" + akhir + "' "
+                       + "GROUP BY p.id_product"; // Dikelompokkan biar barang yang sama jadi satu baris
 
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            // 5. Masukkan Data ke Tabel GUI
             while (rs.next()) {
-                // Masukkan baris ke tabel
-                model.addRow(new Object[]{
-                    rs.getString("id_transaksi"),
-                    rs.getString("tgl_transaksi"),
-                    rs.getString("nama_pegawai"),
-                    rs.getInt("total_harga")
-                });
+                String nama = rs.getString("nama_product");
+                String id = rs.getString("id_product");
+                int qty = rs.getInt("qty_terjual");
+                double hBeli = rs.getDouble("harga_beli");
+                double hJual = rs.getDouble("harga_jual");
+                double subModal = rs.getDouble("total_modal");
+                double subJual = rs.getDouble("total_jual");
                 
-                // Sekalian hitung omzet biar hemat query
-                totalOmzet += rs.getInt("total_harga");
+                // Tambahkan ke Total Besar
+                totalOmset += subJual;
+                totalModal += subModal;
+
+                // Masukkan baris ke JTable
+                model.addRow(new Object[]{
+                    nama,       // Kolom Nama Barang
+                    id,         // Kolom ID Barang
+                    qty,        // Kolom Jumlah
+                    (int)hBeli, // Kolom Harga Beli
+                    (int)hJual, // Kolom Harga Jual
+                    (int)subModal, // Kolom SubTotal Beli
+                    (int)subJual   // Kolom SubTotal Jual
+                });
             }
             
-            tabel.setModel(model);
-            lblOmzet.setText("Rp " + totalOmzet); // Tampilkan total pendapatan
+            // 6. Hitung & Tampilkan Keuntungan Bersih
+            double keuntungan = totalOmset - totalModal;
+            
+            txtOmset.setText("Rp " + (int)totalOmset);
+            txtKeuntungan.setText("Rp " + (int)keuntungan);
+            
+            // Cek jika tidak ada data
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(null, "Tidak ada transaksi pada periode ini.");
+                txtOmset.setText("Rp 0");
+                txtKeuntungan.setText("Rp 0");
+            }
 
         } catch (Exception e) {
             System.out.println("Error Laporan: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Gagal memuat laporan!");
-        }
-    }
-    
-    // 2. CETAK LAPORAN (Opsional - Jika ingin fitur print sederhana)
-    public void cetakLaporan(JTable tabel) {
-        try {
-            // Fitur bawaan Java Swing untuk print tabel
-            tabel.print(); 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Gagal Mencetak");
+            e.printStackTrace();
         }
     }
 }

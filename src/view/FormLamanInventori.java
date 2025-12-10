@@ -3,12 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package view;
-import controller.InventoryController;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+
 /**
  *
  * @author putui
@@ -199,7 +194,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
             }
         });
 
-        BtnMultiItem.setText("MultiItem");
+        BtnMultiItem.setText("+");
         BtnMultiItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BtnMultiItemActionPerformed(evt);
@@ -252,16 +247,15 @@ public class FormLamanInventori extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(BtnCari)
-                                        .addGap(55, 55, 55)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(BtnMultiItem)
+                                        .addGap(20, 20, 20)
                                         .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(TambahStock, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(BtnTambah)
                                     .addComponent(BtnEditJual, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(BtnEditBeli)
-                                        .addGap(40, 40, 40)
-                                        .addComponent(BtnMultiItem)))))
+                                    .addComponent(BtnEditBeli, javax.swing.GroupLayout.Alignment.LEADING))))
                         .addGap(0, 453, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -275,7 +269,8 @@ public class FormLamanInventori extends javax.swing.JFrame {
                     .addComponent(KodeBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(BtnCari)
                     .addComponent(jLabel13)
-                    .addComponent(TambahStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(TambahStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(BtnMultiItem))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
@@ -294,8 +289,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(HargaBeli, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BtnEditBeli)
-                    .addComponent(BtnMultiItem))
+                    .addComponent(BtnEditBeli))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
                 .addGap(18, 18, 18)

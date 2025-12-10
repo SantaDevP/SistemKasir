@@ -25,6 +25,37 @@ public class FormKasir extends javax.swing.JFrame {
     /**
      * Creates new form FormKasir
      */
+    private void resetForm() {
+    // 1. Hapus isi tabel keranjang
+    model.setRowCount(0); 
+    
+    // 2. Reset hitungan total
+    totalBelanja = 0;
+    jLabel7.setText("0"); // Label Total Besar (Sesuaikan nama variabel label Tuanku)
+    
+    // 3. Bersihkan kolom-kolom inputan
+    kodeBarang.setText("");
+    namaBarang.setText("");
+    kuantitas.setText("");
+    bayar.setText("");
+    kembalian.setText("");
+    pelanggan.setText(""); // Opsional: Kosongkan pelanggan juga
+    
+    // 4. Set ulang Tanggal ke Hari Ini
+    tglTransaksi.setDate(new java.util.Date());
+    
+    // 5. Matikan tombol Selesai (karena keranjang kosong)
+    // Asumsi nama tombol selesai adalah 'selesai' atau 'jButton4'
+    selesai.setEnabled(false); 
+    
+    // 6. GENERATE ULANG NOMOR TRANSAKSI (Penting!)
+    // Panggil controller untuk memastikan nomornya update
+    // Pastikan 'transCtrl' sudah dideklarasikan di atas
+    noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
+    
+    // 7. Kembalikan kursor ke kolom Kode Barang (biar kasir siap scan lagi)
+    kodeBarang.requestFocus();
+}
     public FormKasir() {
         initComponents();
         this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
@@ -137,6 +168,11 @@ public class FormKasir extends javax.swing.JFrame {
         });
 
         generateLaporan.setText("Generate Laporan");
+        generateLaporan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generateLaporanActionPerformed(evt);
+            }
+        });
 
         akhirHari.setBackground(new java.awt.Color(102, 0, 0));
         akhirHari.setForeground(new java.awt.Color(255, 255, 255));
@@ -515,6 +551,7 @@ public class FormKasir extends javax.swing.JFrame {
 
     private void resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetActionPerformed
         // TODO add your handling code here:
+        resetForm();
     }//GEN-LAST:event_resetActionPerformed
 
     private void tambahkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tambahkanActionPerformed
@@ -651,7 +688,13 @@ public class FormKasir extends javax.swing.JFrame {
 
     private void inventoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inventoryActionPerformed
         // TODO add your handling code here:
+        new FormLamanInventori().setVisible(true);
     }//GEN-LAST:event_inventoryActionPerformed
+
+    private void generateLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateLaporanActionPerformed
+        // TODO add your handling code here:
+        new FormLaporan().setVisible(true);
+    }//GEN-LAST:event_generateLaporanActionPerformed
 
     /**
      * @param args the command line arguments
