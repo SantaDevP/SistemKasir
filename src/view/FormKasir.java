@@ -177,6 +177,11 @@ public class FormKasir extends javax.swing.JFrame {
         akhirHari.setBackground(new java.awt.Color(102, 0, 0));
         akhirHari.setForeground(new java.awt.Color(255, 255, 255));
         akhirHari.setText("End Day");
+        akhirHari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                akhirHariActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -695,6 +700,20 @@ public class FormKasir extends javax.swing.JFrame {
         // TODO add your handling code here:
         new FormLaporan().setVisible(true);
     }//GEN-LAST:event_generateLaporanActionPerformed
+
+    private void akhirHariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_akhirHariActionPerformed
+        // TODO add your handling code here:
+        int dialogResult = JOptionPane.showConfirmDialog(
+        this, 
+        "Apakah kamu yakin untuk mengakhiri hari ini?",
+        "Konfirmasi",
+        JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if(dialogResult == JOptionPane.OK_OPTION) {
+            new FormGuiEndDay().setVisible(true);
+        }
+    }//GEN-LAST:event_akhirHariActionPerformed
 
     /**
      * @param args the command line arguments

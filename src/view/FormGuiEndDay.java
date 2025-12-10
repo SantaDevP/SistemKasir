@@ -20,6 +20,7 @@ public class FormGuiEndDay extends javax.swing.JFrame {
     public FormGuiEndDay() {
         initComponents();
         this.setLocationRelativeTo(null); // Biar muncul di tengah layar
+        this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 
         // 1. TAMPILKAN NAMA KASIR (Dari Session Login)
         // Pastikan UserSession sudah dibuat sebelumnya
@@ -188,9 +189,9 @@ public class FormGuiEndDay extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(totalItem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(tutup, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tutup, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -216,7 +217,7 @@ public class FormGuiEndDay extends javax.swing.JFrame {
 
     private void tutupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tutupActionPerformed
         // TODO add your handling code here:
-        this.dispose();
+        System.exit(0);
     }//GEN-LAST:event_tutupActionPerformed
 
     /**
