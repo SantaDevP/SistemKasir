@@ -162,15 +162,23 @@ public class FormLamanInventori extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id Barang", "Nama Barang", "Harga Beli", "Harga Jual", "Stock", "Supplier"
+                "Id Barang", "Nama Barang", "Harga Beli", "Harga Jual", "Stock", "Supplier", "Tambah Stock"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         BtnTambah.setText("Tambah");
@@ -205,19 +213,18 @@ public class FormLamanInventori extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jScrollPane1)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(BtnSimpan)
                                     .addComponent(BtnReset)
                                     .addComponent(BtnKembali)))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -256,7 +263,10 @@ public class FormLamanInventori extends javax.swing.JFrame {
                                     .addComponent(BtnTambah)
                                     .addComponent(BtnEditJual, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(BtnEditBeli, javax.swing.GroupLayout.Alignment.LEADING))))
-                        .addGap(0, 453, Short.MAX_VALUE)))
+                        .addGap(0, 453, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(BtnSimpan)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -309,35 +319,12 @@ public class FormLamanInventori extends javax.swing.JFrame {
     }//GEN-LAST:event_KodeBarangActionPerformed
 
     private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSimpanActionPerformed
-    // 1. Validasi
-    if (KodeBarang.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Cari Barang dulu!");
-        return;
-    }
-    
-    // Jika kolom tambah stok kosong, anggap 0 (mungkin cuma mau edit harga)
-    if (TambahStock.getText().isEmpty()) {
-        TambahStock.setText("0");
-    }
-
-    try {
-        // 2. Ambil Data
-        String id = KodeBarang.getText();
-        int jumlahTambah = Integer.parseInt(TambahStock.getText());
-        int hgBeli = Integer.parseInt(HargaBeli.getText());
-        int hgJual = Integer.parseInt(HargaJual.getText());
-
-        // 3. Eksekusi Update
         controller.InventoryController inv = new controller.InventoryController();
-        inv.updateStokDanHarga(id, jumlahTambah, hgBeli, hgJual);
-
-        // 4. Refresh Tabel & Reset
-        inv.tampilkanData(jTable1); // Pastikan nama tabel di design 'jTable1'
-        BtnResetActionPerformed(evt); // Panggil tombol reset
-        
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka!");
-    }    // TODO add your handling code here:
+        inv.simpanDariTabel(jTable1);
+    
+    // Bersihkan Tabel setelah simpan
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
     }//GEN-LAST:event_BtnSimpanActionPerformed
 
     private void NamaBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NamaBarangActionPerformed
@@ -359,60 +346,6 @@ public class FormLamanInventori extends javax.swing.JFrame {
         // Saat tekan Enter, pindahkan kursor ke kolom Tambah Stock
     TambahStock.requestFocus();// TODO add your handling code here:
     }//GEN-LAST:event_HargaBeliActionPerformed
-
-    private void TambahStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TambahStockActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TambahStockActionPerformed
-
-    private void BtnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTambahActionPerformed
-// 1. Validasi
-    if (KodeBarang.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang dulu (Cari)!");
-        return;
-    }
-    
-    if (TambahStock.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Isi jumlah stok yang mau ditambah!");
-        TambahStock.requestFocus();
-        return;
-    }
-
-    try {
-        String id = KodeBarang.getText();
-        int tambahanStok = Integer.parseInt(TambahStock.getText());
-        int hgBeli = Integer.parseInt(HargaBeli.getText());
-        int hgJual = Integer.parseInt(HargaJual.getText());
-
-        // 2. Update Database
-        controller.InventoryController inv = new controller.InventoryController();
-        inv.updateStokDanHarga(id, tambahanStok, hgBeli, hgJual);
-
-        // --- FITUR ANTI DUPLIKAT (Supaya Tabel Rapi) ---
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-        
-        // Cek satu per satu baris yang ada di tabel
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String idDiTabel = model.getValueAt(i, 0).toString();
-            
-            // Jika ketemu ID yang sama...
-            if (idDiTabel.equals(id)) {
-                model.removeRow(i); // ...Hapus baris lama tersebut!
-                break; // Berhenti mencari karena sudah dihapus
-            }
-        }
-        // -----------------------------------------------
-
-        // 3. Masukkan Data Terbaru (Otomatis muncul di paling bawah)
-        inv.tambahBarisTabel(jTable1, id);
-
-        // 4. Bersihkan Input Stok
-        TambahStock.setText("");
-        
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Kolom Stok/Harga harus angka!");
-    
-    }
-    }//GEN-LAST:event_BtnTambahActionPerformed
 
     private void BtnEditJualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEditJualActionPerformed
     // Buka kunci hanya untuk Harga Jual
@@ -514,55 +447,93 @@ public class FormLamanInventori extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnKembaliActionPerformed
 
     private void BtnMultiItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnMultiItemActionPerformed
-                                             
-    // 1. VALIDASI: Pastikan sudah Cari Barang & Isi Stok
     if (KodeBarang.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Cari barang dulu sebelum dimasukkan ke tabel!");
-        return;
-    }
-    if (TambahStock.getText().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Isi jumlah stok yang mau ditambah!");
-        TambahStock.requestFocus();
-        return;
-    }
+            javax.swing.JOptionPane.showMessageDialog(this, "Cari barang dulu!");
+            return;
+        }
 
-    try {
-        // 2. AMBIL DATA DARI FORM
-        String id = KodeBarang.getText();
-        int tambahanStok = Integer.parseInt(TambahStock.getText());
-        int hgBeli = Integer.parseInt(HargaBeli.getText());
-        int hgJual = Integer.parseInt(HargaJual.getText());
+        // --- HAPUS/KOMENTARI UPDATE STOK DISINI ---
+        // inv.updateStokDanHarga(...);  <-- JANGAN DIPANGGIL DISINI
 
-        // 3. UPDATE DATABASE (Stok Bertambah)
+        // 1. Masukkan ke Tabel
         controller.InventoryController inv = new controller.InventoryController();
-        inv.updateStokDanHarga(id, tambahanStok, hgBeli, hgJual);
 
-        // 4. LOGIKA KERANJANG (ANTI DUPLIKAT)
-        // Kita cek tabel: Kalau barang ini sudah ada di tabel, hapus baris lamanya.
-        // Supaya tidak ada 2 baris "Mouse" yang sama.
+        // Cek duplikat (Hapus baris lama kalau sudah ada di tabel)
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-        
         for (int i = 0; i < model.getRowCount(); i++) {
-            String idDiTabel = model.getValueAt(i, 0).toString(); // Ambil ID di kolom pertama
-            if (idDiTabel.equals(id)) {
-                model.removeRow(i); // Hapus baris lama
-                break; // Stop looping karena sudah ketemu
+            if (model.getValueAt(i, 0).toString().equals(KodeBarang.getText())) {
+                model.removeRow(i);
+                break;
             }
         }
 
-        // 5. MASUKKAN DATA TERBARU (Tempel di Paling Bawah)
-        inv.tambahBarisTabel(jTable1, id);
+        // Panggil method yang sudah kita update tadi (yang ada "0"-nya)
+        inv.tambahBarisTabel(jTable1, KodeBarang.getText());
 
-        // 6. BERSIHKAN INPUT (Siap untuk barang selanjutnya)
-        TambahStock.setText("");     // Kosongkan stok
-        KodeBarang.setText("");      // Kosongkan kode (opsional, biar user tau proses selesai)
-        NamaBarang.setText("");      // Bersihkan nama juga biar rapi
-        KodeBarang.requestFocus();   // Kursor balik ke Kode Barang (Siap Scan/Ketik lagi)
-        
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Kolom Stok harus angka!");
-    }
+        // 2. Bersihkan Input
+        KodeBarang.setText("");
+        NamaBarang.setText("");
+        Kategori.setText("");
+        HargaBeli.setText("");
+        HargaJual.setText("");
+        TambahStock.setText(""); // Kosongkan textfield, karena nanti ngisinya di TABEL
+
+        KodeBarang.requestFocus();
     }//GEN-LAST:event_BtnMultiItemActionPerformed
+
+    private void BtnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnTambahActionPerformed
+        // 1. Validasi
+        if (KodeBarang.getText().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang dulu (Cari)!");
+            return;
+        }
+
+        if (TambahStock.getText().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Isi jumlah stok yang mau ditambah!");
+            TambahStock.requestFocus();
+            return;
+        }
+
+        try {
+            String id = KodeBarang.getText();
+            int tambahanStok = Integer.parseInt(TambahStock.getText());
+            int hgBeli = Integer.parseInt(HargaBeli.getText());
+            int hgJual = Integer.parseInt(HargaJual.getText());
+
+            // 2. Update Database
+            controller.InventoryController inv = new controller.InventoryController();
+            inv.updateStokDanHarga(id, tambahanStok, hgBeli, hgJual);
+
+            // --- FITUR ANTI DUPLIKAT (Supaya Tabel Rapi) ---
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+            // Cek satu per satu baris yang ada di tabel
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String idDiTabel = model.getValueAt(i, 0).toString();
+
+                // Jika ketemu ID yang sama...
+                if (idDiTabel.equals(id)) {
+                    model.removeRow(i); // ...Hapus baris lama tersebut!
+                    break; // Berhenti mencari karena sudah dihapus
+                }
+            }
+            // -----------------------------------------------
+
+            // 3. Masukkan Data Terbaru (Otomatis muncul di paling bawah)
+            inv.tambahBarisTabel(jTable1, id);
+
+            // 4. Bersihkan Input Stok
+            TambahStock.setText("");
+
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Kolom Stok/Harga harus angka!");
+
+        }
+    }//GEN-LAST:event_BtnTambahActionPerformed
+
+    private void TambahStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TambahStockActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TambahStockActionPerformed
 
     /**
      * @param args the command line arguments

@@ -57,12 +57,13 @@ public class InventoryController {
         model.addColumn("Harga Beli");
         model.addColumn("Harga Jual");
         model.addColumn("Stok");
-        model.addColumn("Kategori"); // Muncul Teks (bukan angka)
+        model.addColumn("Supplier");
+        model.addColumn("Tambah Stock");// Muncul Teks (bukan angka)
         
         try {
             Statement st = con.createStatement();
             // JOIN: Ambil nama kategori dari tabel supplier
-            String sql = "SELECT p.id_product, p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.Kategori " +
+            String sql = "SELECT p.id_product, p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.nama_supplier " +
                          "FROM product p LEFT JOIN supplier s ON p.id_supplier = s.id_supplier";
             
             ResultSet rs = st.executeQuery(sql);
@@ -74,7 +75,8 @@ public class InventoryController {
                     rs.getInt("harga_beli"),
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
-                    rs.getString("Kategori") // Muncul Huruf (misal: Makanan)
+                    rs.getString("nama_supplier"), // Muncul Huruf (misal: Makanan)
+                    "0"
                 });
             }
             tabel.setModel(model);
@@ -89,7 +91,7 @@ public class InventoryController {
         String[] data = new String[5];
         
         try {
-            String sql = "SELECT p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.Kategori " +
+            String sql = "SELECT p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.nama_supplier " +
                          "FROM product p LEFT JOIN supplier s ON p.id_supplier = s.id_supplier " +
                          "WHERE p.id_product = ?";
             
@@ -99,7 +101,7 @@ public class InventoryController {
             
             if (rs.next()) {
                 data[0] = rs.getString("nama_product");
-                data[1] = rs.getString("Kategori"); 
+                data[1] = rs.getString("nama_supplier"); 
                 data[2] = rs.getString("harga_beli"); 
                 data[3] = rs.getString("harga_jual");       
                 data[4] = rs.getString("stok");       
@@ -144,10 +146,11 @@ public class InventoryController {
         model.addColumn("Harga Beli");
         model.addColumn("Harga Jual");
         model.addColumn("Stok");
-        model.addColumn("Kategori"); 
+        model.addColumn("Supplier"); 
+        model.addColumn("Tambah Stock");
         
         try {
-            String sql = "SELECT p.id_product, p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.Kategori " +
+            String sql = "SELECT p.id_product, p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.nama_supplier " +
                          "FROM product p LEFT JOIN supplier s ON p.id_supplier = s.id_supplier " +
                          "WHERE p.id_product = ?";
                          
@@ -162,7 +165,8 @@ public class InventoryController {
                     rs.getInt("harga_beli"),
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
-                    rs.getString("Kategori")
+                    rs.getString("nama_supplier"),
+                    "0"
                 });
             }
             tabel.setModel(model);
@@ -193,7 +197,8 @@ public class InventoryController {
                     rs.getInt("harga_beli"),
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
-                    rs.getString("Kategori")
+                    rs.getString("Kategori"),
+                    "0"
                 });
             }
         } catch (Exception e) {
@@ -251,6 +256,53 @@ public class InventoryController {
         } catch (Exception e) {
             System.out.println("Error Cek Barang: " + e.getMessage());
             return false;
+        }
+    }
+    // Tambahkan di InventoryController.java
+
+    public void simpanDariTabel(JTable tabel) {
+        Connection con = DBaseConnection.connect();
+        try {
+            // Matikan auto-save biar prosesnya cepat (Batch Processing)
+            con.setAutoCommit(false); 
+
+            String sql = "UPDATE product SET stok = stok + ? WHERE id_product = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            DefaultTableModel model = (DefaultTableModel) tabel.getModel();
+
+            // Loop semua baris di tabel
+            for (int i = 0; i < model.getRowCount(); i++) {
+                // Ambil ID Barang (Kolom index 0)
+                String id = model.getValueAt(i, 0).toString();
+
+                // Ambil Angka Tambahan Stok (Kolom index 6 / Paling Kanan)
+                Object nilaiObj = model.getValueAt(i, 6);
+                int tambah = 0;
+
+                // Cek biar gak error kalau user mengosongkan kolom
+                if (nilaiObj != null && !nilaiObj.toString().isEmpty()) {
+                    tambah = Integer.parseInt(nilaiObj.toString());
+                }
+
+                // Kalau angkanya lebih dari 0, baru kita update
+                if (tambah > 0) {
+                    ps.setInt(1, tambah); // Tambah Stok
+                    ps.setString(2, id);  // Where ID...
+                    ps.addBatch();        // Masukkan ke antrian   
+                }
+            }
+
+            // Eksekusi semua sekaligus
+            ps.executeBatch();
+            con.commit();
+            con.setAutoCommit(true);
+
+            JOptionPane.showMessageDialog(null, "Stok Berhasil Diupdate Massal!");
+
+        } catch (Exception e) {
+            System.out.println("Error Simpan Tabel: " + e.getMessage());
+            try { con.rollback(); } catch(Exception ex){}
         }
     }
 }
