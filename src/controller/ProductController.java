@@ -20,34 +20,32 @@ import model.product; // Import model
  */
 public class ProductController {
 
-    // 1. CARI BARANG (UNTUK KASIR)
-    public product cariBarang(int id) {
-        product p = null;
-        try {
-            Connection con = DBaseConnection.connect();
-            Statement st = con.createStatement();
-            String sql = "SELECT * FROM product WHERE id_product=" + id;
-            ResultSet rs = st.executeQuery(sql);
-            
-            if (rs.next()) {
-                p = new product();
-                p.setId_product(rs.getInt("id_product"));
-                p.setNama_product(rs.getString("nama_product"));
-                p.setHarga_jual(rs.getDouble("harga_jual"));
-                p.setStok(rs.getInt("stok"));
-            }
-        } catch (Exception e) {
-            System.out.println("Error Cari Barang: " + e.getMessage());
+    
+public model.product cariBarang(int id) {
+    model.product p = null;
+    try {
+        java.sql.Connection con = connection.DBaseConnection.connect();
+        java.sql.Statement st = con.createStatement();
+        String sql = "SELECT * FROM product WHERE id_product=" + id;
+        java.sql.ResultSet rs = st.executeQuery(sql);
+        
+        if (rs.next()) {
+            p = new model.product();
+            p.setId_product(rs.getInt("id_product"));
+            p.setNama_product(rs.getString("nama_product"));
+            p.setHarga_jual(rs.getDouble("harga_jual"));
+            p.setStok(rs.getInt("stok"));
         }
-        return p;
+    } catch (Exception e) {
+        System.out.println("Error Cari Barang: " + e.getMessage());
     }
-
-    // 2. TAMPILKAN DATA (UNTUK FORM ADMIN GUDANG)
+    return p;
+}
+ 
     public void tampilkanData(JTable tabel, String cari) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = new DefaultTableModel();
-        
-        // Sesuaikan nama kolom dengan desain tabelmu
+   
         model.addColumn("ID Barang");
         model.addColumn("Nama Barang");
         model.addColumn("Stok");
@@ -55,11 +53,11 @@ public class ProductController {
 
         try {
             String sql;
-            // Jika kolom pencarian kosong, ambil semua data
+      
             if (cari == null || cari.equals("")) {
                 sql = "SELECT * FROM product";
             } else {
-                // Jika ada kata kunci, cari berdasarkan ID atau Nama
+        
                 sql = "SELECT * FROM product WHERE id_product LIKE '%" + cari + "%' OR nama_product LIKE '%" + cari + "%'";
             }
 
@@ -81,11 +79,11 @@ public class ProductController {
         }
     }
 
-    // 3. TAMBAH BARANG BARU
+ 
     public void tambahBarang(String id, String nama, int stok, double harga, int idSupplier) {
         Connection con = DBaseConnection.connect();
         try {
-            // Cek dulu apakah ID sudah ada?
+      
             if (cekIdAda(id)) {
                 JOptionPane.showMessageDialog(null, "ID Barang sudah ada! Gunakan ID lain.");
                 return;
@@ -97,8 +95,8 @@ public class ProductController {
             ps.setString(2, nama);
             ps.setInt(3, stok);
             ps.setDouble(4, harga);
-            ps.setDouble(5, harga * 0.8); // Otomatis set harga beli 80% dari jual (Contoh)
-            ps.setInt(6, idSupplier); // Default supplier 1 jika null
+            ps.setDouble(5, harga * 0.8);  
+            ps.setInt(6, idSupplier);  
             
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan!");
@@ -108,7 +106,7 @@ public class ProductController {
         }
     }
 
-    // 4. EDIT BARANG
+    
     public void editBarang(String id, String nama, int stok, double harga) {
         Connection con = DBaseConnection.connect();
         try {
@@ -117,7 +115,7 @@ public class ProductController {
             ps.setString(1, nama);
             ps.setInt(2, stok);
             ps.setDouble(3, harga);
-            ps.setString(4, id); // Where id = ...
+            ps.setString(4, id);  
             
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Data Berhasil Diupdate!");
@@ -127,10 +125,10 @@ public class ProductController {
         }
     }
 
-    // 5. HAPUS BARANG
+     
     public void hapusBarang(String id) {
         Connection con = DBaseConnection.connect();
-        // Konfirmasi dulu sebelum hapus
+         
         int tanya = JOptionPane.showConfirmDialog(null, "Yakin hapus barang ID: " + id + "?");
         
         if (tanya == JOptionPane.YES_OPTION) {
@@ -148,14 +146,14 @@ public class ProductController {
         }
     }
     
-    // --- Method Bantuan: Cek ID Kembar ---
+     
     private boolean cekIdAda(String id) {
         Connection con = DBaseConnection.connect();
         try {
             String sql = "SELECT * FROM product WHERE id_product = '" + id + "'";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            return rs.next(); // True jika data ditemukan
+            return rs.next();  
         } catch (Exception e) {
             return false;
         }

@@ -16,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class InventoryController {
     
-    // 1. SIMPAN BARANG BARU (Insert)
+     
     public void simpanBarangBaru(String id, String nama, String idKategori, int hargaBeli, int hargaJual, int stokAwal) {
         Connection con = DBaseConnection.connect();
         try {
@@ -25,8 +25,7 @@ public class InventoryController {
                 return;
             }
 
-            // Query Insert ke tabel product
-            // Kita simpan ID Kategori (Angka) ke kolom id_supplier
+             
             String sql = "INSERT INTO product (id_product, nama_product, id_supplier, harga_beli, harga_jual, stok) VALUES (?, ?, ?, ?, ?, ?)";
             
             PreparedStatement ps = con.prepareStatement(sql);
@@ -46,23 +45,23 @@ public class InventoryController {
         }
     }
 
-    // 2. TAMPILKAN SEMUA DATA (Reset Tabel)
+    
     public void tampilkanData(JTable tabel) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = new DefaultTableModel();
         
-        // Header Tabel
+         
         model.addColumn("ID Produk");
         model.addColumn("Nama Barang");
         model.addColumn("Harga Beli");
         model.addColumn("Harga Jual");
         model.addColumn("Stok");
         model.addColumn("Supplier");
-        model.addColumn("Tambah Stock");// Muncul Teks (bukan angka)
+        model.addColumn("Tambah Stock"); 
         
         try {
             Statement st = con.createStatement();
-            // JOIN: Ambil nama kategori dari tabel supplier
+             
             String sql = "SELECT p.id_product, p.nama_product, p.harga_beli, p.harga_jual, p.stok, s.nama_supplier " +
                          "FROM product p LEFT JOIN supplier s ON p.id_supplier = s.id_supplier";
             
@@ -85,7 +84,7 @@ public class InventoryController {
         }
     }
 
-    // 3. CARI DETAIL (Untuk Mengisi Form)
+     
     public String[] cariDetailProduct(String idProduct) {
         Connection con = DBaseConnection.connect();
         String[] data = new String[5];
@@ -114,9 +113,34 @@ public class InventoryController {
         }
         return data;
     }
-
-    // 4. UPDATE STOK DAN HARGA
-    public void updateStokDanHarga(String idProduct, int tambahStok, int hargaBeliBaru, int hargaJualBaru) {
+    public void updateHargaJual(String id, int hargaBaru) {
+        Connection con = DBaseConnection.connect();
+        try {
+            String sql = "UPDATE product SET harga_jual = ? WHERE id_product = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, hargaBaru);
+            ps.setString(2, id);
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Harga Jual Berhasil Diupdate!");
+        } catch (Exception e) {
+            System.out.println("Error Update Jual: " + e.getMessage());
+        }
+    }
+    public void updateHargaBeli(String id, int hargaBaru) {
+    Connection con = DBaseConnection.connect();
+    try {
+        String sql = "UPDATE product SET harga_beli = ? WHERE id_product = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, hargaBaru);
+        ps.setString(2, id);
+        ps.executeUpdate();
+        JOptionPane.showMessageDialog(null, "Harga Beli Berhasil Diupdate!");
+    } catch (Exception e) {
+        System.out.println("Error Update Beli: " + e.getMessage());
+    }
+}
+     
+    public void updateStok(String idProduct, int tambahStok, int hargaBeliBaru, int hargaJualBaru) {
         Connection con = DBaseConnection.connect();
         try {
             String sql = "UPDATE product SET stok = stok + ?, harga_beli = ?, harga_jual = ? WHERE id_product = ?";
@@ -136,7 +160,7 @@ public class InventoryController {
         }
     }
 
-    // 5. FILTER TABEL (Hanya Tampilkan 1 Barang, Tabel Direset Dulu)
+     
     public void filterTable(JTable tabel, String id) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = new DefaultTableModel();
@@ -175,10 +199,10 @@ public class InventoryController {
         }
     }
 
-    // 6. TAMBAH BARIS KE TABEL (Tanpa Reset, Menumpuk ke Bawah)
+     
     public void tambahBarisTabel(JTable tabel, String id) {
         Connection con = DBaseConnection.connect();
-        // Ambil model yang SUDAH ADA (Jangan bikin baru)
+         
         DefaultTableModel model = (DefaultTableModel) tabel.getModel();
         
         try {
@@ -206,12 +230,11 @@ public class InventoryController {
         }
     }
 
-    // 7. CEK ATAU BUAT KATEGORI BARU (Helper)
-    // Kalau user ketik "Minuman", sistem cari ID-nya. Kalau gak ada, dibuatkan baru.
+     
     public String cekAtauBuatKategori(String namaKategori) {
         Connection con = DBaseConnection.connect();
         try {
-            // A. CEK SUDAH ADA?
+             
             String sqlCek = "SELECT id_supplier FROM supplier WHERE Kategori LIKE ?";
             PreparedStatement psCek = con.prepareStatement(sqlCek);
             psCek.setString(1, namaKategori);
@@ -220,7 +243,7 @@ public class InventoryController {
             if (rs.next()) {
                 return rs.getString("id_supplier"); // Ada, kembalikan ID
             } else {
-                // B. BELUM ADA, BUAT BARU
+                 
                 Statement st = con.createStatement();
                 ResultSet rsMax = st.executeQuery("SELECT MAX(id_supplier) FROM supplier");
                 int idBaru = 1;
@@ -243,8 +266,7 @@ public class InventoryController {
         }
     }
 
-    // 8. CEK APAKAH BARANG SUDAH ADA (Boolean)
-    // Dipakai untuk Validasi Tombol Tambah (Hybrid)
+     
     public boolean cekApakahBarangAda(String id) {
         Connection con = DBaseConnection.connect();
         try {
@@ -258,51 +280,73 @@ public class InventoryController {
             return false;
         }
     }
-    // Tambahkan di InventoryController.java
+     
 
     public void simpanDariTabel(JTable tabel) {
+            if (tabel.isCellSelected(tabel.getSelectedRow(), tabel.getSelectedColumn())) {
+            if (tabel.isEditing()) {
+                tabel.getCellEditor().stopCellEditing();
+            }
+        }
+
         Connection con = DBaseConnection.connect();
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tabel.getModel();
+
         try {
-            // Matikan auto-save biar prosesnya cepat (Batch Processing)
-            con.setAutoCommit(false); 
+            con.setAutoCommit(false);  
 
             String sql = "UPDATE product SET stok = stok + ? WHERE id_product = ?";
             PreparedStatement ps = con.prepareStatement(sql);
 
-            DefaultTableModel model = (DefaultTableModel) tabel.getModel();
+            boolean adaPerubahan = false;
 
-            // Loop semua baris di tabel
+             
             for (int i = 0; i < model.getRowCount(); i++) {
-                // Ambil ID Barang (Kolom index 0)
                 String id = model.getValueAt(i, 0).toString();
 
-                // Ambil Angka Tambahan Stok (Kolom index 6 / Paling Kanan)
-                Object nilaiObj = model.getValueAt(i, 6);
+                 
+                Object tambahObj = model.getValueAt(i, 6);
                 int tambah = 0;
 
-                // Cek biar gak error kalau user mengosongkan kolom
-                if (nilaiObj != null && !nilaiObj.toString().isEmpty()) {
-                    tambah = Integer.parseInt(nilaiObj.toString());
+                if (tambahObj != null && !tambahObj.toString().isEmpty()) {
+                    tambah = Integer.parseInt(tambahObj.toString());
                 }
 
-                // Kalau angkanya lebih dari 0, baru kita update
+                 
                 if (tambah > 0) {
-                    ps.setInt(1, tambah); // Tambah Stok
-                    ps.setString(2, id);  // Where ID...
-                    ps.addBatch();        // Masukkan ke antrian   
+                     
+                    ps.setInt(1, tambah);
+                    ps.setString(2, id);
+                    ps.addBatch();
+                    adaPerubahan = true;
+
+                     
+                    int stokLama = Integer.parseInt(model.getValueAt(i, 4).toString());
+
+                     
+                    int stokBaru = stokLama + tambah;
+
+                     
+                    model.setValueAt(stokBaru, i, 4);
+
+                     
+                    model.setValueAt("0", i, 6);
                 }
             }
 
-            // Eksekusi semua sekaligus
-            ps.executeBatch();
-            con.commit();
+            if (adaPerubahan) {
+                ps.executeBatch();
+                con.commit();
+                JOptionPane.showMessageDialog(null, "Stok Berhasil Diupdate!");
+            } else {
+                 
+            }
+
             con.setAutoCommit(true);
 
-            JOptionPane.showMessageDialog(null, "Stok Berhasil Diupdate Massal!");
-
         } catch (Exception e) {
-            System.out.println("Error Simpan Tabel: " + e.getMessage());
-            try { con.rollback(); } catch(Exception ex){}
+            System.out.println("Error Simpan: " + e.getMessage());
+            try { con.rollback(); } catch (Exception ex) {}
         }
     }
 }

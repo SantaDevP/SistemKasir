@@ -38,7 +38,7 @@ public class SupplierController {
         }
     }
 
-    // 2. Tambah Supplier Baru
+    
     public void tambahSupplier(String nama, String telp, String alamat) {
         Connection con = DBaseConnection.connect();
         try {

@@ -17,8 +17,10 @@ public class FormLaporan extends javax.swing.JFrame {
         initComponents();
         this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel();
-        table.setModel(model); // Pastikan nama variabel tabelnya jTable1
+        table.setModel(model); 
 
+        model.addColumn("No Transaksi");     
+        model.addColumn("Pelanggan");     
         model.addColumn("Nama Barang");
         model.addColumn("Id Barang");
         model.addColumn("Jumlah");
@@ -78,10 +80,13 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jLabel2.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel2.setText("Tanggal Awal");
 
+        jLabel3.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel3.setText("Tanggal Akhir");
 
+        proses.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         proses.setText("Proses");
         proses.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,8 +94,14 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
+        jLabel4.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel4.setText("Keuntungan");
 
+        keuntungan.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+
+        omset.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+
+        jLabel5.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel5.setText("Omset");
 
         table.setModel(new javax.swing.table.DefaultTableModel(
@@ -107,6 +118,7 @@ public class FormLaporan extends javax.swing.JFrame {
         Scrool.setViewportView(table);
 
         cetak.setBackground(new java.awt.Color(0, 102, 51));
+        cetak.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         cetak.setText("Cetak");
         cetak.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,6 +126,7 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
+        kembali.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         kembali.setText("Kembali");
         kembali.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -121,6 +134,7 @@ public class FormLaporan extends javax.swing.JFrame {
             }
         });
 
+        reset.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         reset.setText("Reset");
         reset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -187,7 +201,7 @@ public class FormLaporan extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(proses)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(Scrool, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                .addComponent(Scrool, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -230,11 +244,11 @@ public class FormLaporan extends javax.swing.JFrame {
     // Cek: Klik kanan komponen -> Change Variable Name
     
     lap.tampilkanLaporan(
-        tglawal,      // Tanggal Mulai
-        tglakhir,      // Tanggal Akhir
-        table,            // Tabel
-        omset,    // Textfield Omset (Bawah)
-        keuntungan // Textfield Keuntungan (Atas)
+        tglawal,      
+        tglakhir,     
+        table,           
+        omset,   
+        keuntungan 
     );
     }//GEN-LAST:event_prosesActionPerformed
 
@@ -245,7 +259,7 @@ public class FormLaporan extends javax.swing.JFrame {
         omset.setText("");
         keuntungan.setText("");
 
-        // Kosongkan Tabel
+        
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) table.getModel();
         model.setRowCount(0);
     }//GEN-LAST:event_resetActionPerformed
@@ -253,13 +267,13 @@ public class FormLaporan extends javax.swing.JFrame {
     private void cetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakActionPerformed
         // TODO add your handling code here:
         try {
-        // Cek tabel kosong atau tidak
+        
         if (table.getRowCount() == 0) {
             javax.swing.JOptionPane.showMessageDialog(this, "Tidak ada data untuk dicetak!");
             return;
         }
 
-        // Buat Judul Laporan
+        
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
         String tgl1 = (tglawal.getDate() != null) ? sdf.format(tglawal.getDate()) : "-";
         String tgl2 = (tglakhir.getDate() != null) ? sdf.format(tglakhir.getDate()) : "-";
@@ -267,7 +281,7 @@ public class FormLaporan extends javax.swing.JFrame {
         java.text.MessageFormat header = new java.text.MessageFormat("LAPORAN PENJUALAN CLANDYS (" + tgl1 + " s.d " + tgl2 + ")");
         java.text.MessageFormat footer = new java.text.MessageFormat("Halaman {0,number,integer}");
         
-        // Cetak
+        
         table.print(javax.swing.JTable.PrintMode.FIT_WIDTH, header, footer);
         
     } catch (Exception e) {

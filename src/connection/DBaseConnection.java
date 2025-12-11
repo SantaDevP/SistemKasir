@@ -17,13 +17,12 @@ import java.sql.SQLException;
   public static Connection connect() {
         Connection con = null;
         try {
-            // URL database, nama pengguna, dan kata sandi
-           // String url = "jdbc:mysql://localhost:3306/apotek";
+           
             String url = "jdbc:mysql://localhost:3306/clandys";
             String user = "root";
             String password = "";
 
-            // Membuat koneksi
+            
             con = DriverManager.getConnection(url, user, password);
             System.out.println("Koneksi berhasil!");
 

@@ -19,32 +19,27 @@ public class FormGuiEndDay extends javax.swing.JFrame {
      */
     public FormGuiEndDay() {
         initComponents();
-        this.setLocationRelativeTo(null); // Biar muncul di tengah layar
+        this.setLocationRelativeTo(null); 
         this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
-
-        // 1. TAMPILKAN NAMA KASIR (Dari Session Login)
-        // Pastikan UserSession sudah dibuat sebelumnya
+        
         namaKasir.setText(userSession.getNama_pegawai());
-        namaKasir.setEditable(false); // Biar gak bisa diganti
+        namaKasir.setEditable(false);  
         keuntungan.setEditable(false);
         totalItem.setEditable(false);
 
-        // 2. SET TANGGAL HARI INI (Default)
+         
         Date hariIni = new Date();
         tanggal.setDate(hariIni);
 
-        // 3. PANGGIL CONTROLLER PERTAMA KALI
+         
         EndDayController endDay = new EndDayController();
         endDay.tampilkanEndDay(hariIni, table, keuntungan, totalItem);
-
-        // 4. FITUR OTOMATIS: KALAU TANGGAL DIGANTI, DATA BERUBAH
-        // Kita pasang "Penyadap" (Listener) di Kalender
         tanggal.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getNewValue() != null) {
                     Date tglBaru = (Date) evt.getNewValue();
-                    // Panggil controller lagi dengan tanggal baru
+                     
                     endDay.tampilkanEndDay(tglBaru, table, keuntungan, totalItem);
                 }
             }
@@ -79,8 +74,9 @@ public class FormGuiEndDay extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(153, 0, 0));
 
+        jLabel1.setFont(new java.awt.Font("Poppins ExtraBold", 0, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("END DAY REPOTY");
+        jLabel1.setText("END DAY REPORT");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -99,18 +95,25 @@ public class FormGuiEndDay extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jLabel2.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel2.setText("Nama Kasir");
 
         namaKasir.setEditable(false);
+        namaKasir.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
 
+        jLabel3.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel3.setText("Keuntungan");
 
         keuntungan.setEditable(false);
+        keuntungan.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
 
+        jLabel4.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel4.setText("Total Item");
 
         totalItem.setEditable(false);
+        totalItem.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
 
+        jLabel5.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         jLabel5.setText("Tanggal");
 
         table.setModel(new javax.swing.table.DefaultTableModel(
@@ -126,6 +129,7 @@ public class FormGuiEndDay extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(table);
 
+        tutup.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         tutup.setText("Tutup");
         tutup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -189,7 +193,7 @@ public class FormGuiEndDay extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(totalItem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tutup, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())

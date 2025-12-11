@@ -23,7 +23,7 @@ public class PegawaiController {
         model.addColumn("ID");
         model.addColumn("Nama Lengkap");
         model.addColumn("Username");
-        model.addColumn("Password"); // Hati-hati menampilkan password di aplikasi asli
+        model.addColumn("Password");  
         
         try {
             Statement st = con.createStatement();
@@ -45,7 +45,7 @@ public class PegawaiController {
         }
     }
     
-    // 2. TAMBAH PEGAWAI BARU
+     
     public void tambahPegawai(String nama, String user, String pass) {
         Connection con = DBaseConnection.connect();
         try {
@@ -63,7 +63,7 @@ public class PegawaiController {
         }
     }
     
-    // 3. EDIT DATA PEGAWAI
+     
     public void editPegawai(int id, String nama, String user, String pass) {
         Connection con = DBaseConnection.connect();
         try {
@@ -81,8 +81,7 @@ public class PegawaiController {
             JOptionPane.showMessageDialog(null, "Gagal Edit: " + e.getMessage());
         }
     }
-    
-    // 4. HAPUS PEGAWAI
+     
     public void hapusPegawai(int id) {
         Connection con = DBaseConnection.connect();
         int tanya = JOptionPane.showConfirmDialog(null, "Hapus pegawai ID: " + id + "?");
@@ -95,7 +94,7 @@ public class PegawaiController {
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Pegawai Dihapus!");
             } catch (Exception e) {
-                // Biasanya error jika pegawai ini sudah pernah melakukan transaksi (Foreign Key)
+                 
                 JOptionPane.showMessageDialog(null, "Gagal! Pegawai ini memiliki riwayat transaksi.");
             }
         }

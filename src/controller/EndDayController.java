@@ -19,9 +19,9 @@ public class EndDayController {
     public void tampilkanEndDay(Date tanggalDipilih, JTable tabel, JTextField txtKeuntungan, JTextField txtTotalItem) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = (DefaultTableModel) tabel.getModel();
-        model.setRowCount(0); // Bersihkan tabel
+        model.setRowCount(0);   
 
-        // Format tanggal agar cocok dengan database (yyyy-MM-dd)
+         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String tglStr = sdf.format(tanggalDipilih);
 
@@ -29,13 +29,12 @@ public class EndDayController {
         int totalBarang = 0;
 
         try {
-            // QUERY 1: ISI TABEL (Rincian Barang Terjual Hari Ini)
-            // Kita Group By product agar barang yang sama dijumlahkan qty-nya
+            
             String sqlTabel = "SELECT p.id_product, p.nama_product, "
                             + "SUM(dt.quantity) as qty_total, "
                             + "p.harga_jual, "
                             + "SUM(dt.subtotal) as subtotal_jual, "
-                            + "SUM(dt.quantity * p.harga_beli) as subtotal_beli " // Modal total item ini
+                            + "SUM(dt.quantity * p.harga_beli) as subtotal_beli "  
                             + "FROM detail_transaksi dt "
                             + "JOIN transaksi t ON dt.id_transaksi = t.id_transaksi "
                             + "JOIN product p ON dt.id_product = p.id_product "
@@ -50,23 +49,15 @@ public class EndDayController {
                 String nama = rs.getString("nama_product");
                 int qty = rs.getInt("qty_total");
                 int harga = rs.getInt("harga_jual");
-                int subJual = rs.getInt("subtotal_jual"); // Omset item ini
-                int subBeli = rs.getInt("subtotal_beli"); // Modal item ini
-                
-                // Hitung keuntungan per item (Jual - Beli)
+                int subJual = rs.getInt("subtotal_jual");  
+                int subBeli = rs.getInt("subtotal_beli");  
                 int untungItem = subJual - subBeli;
-
-                // Masukkan ke Tabel
                 model.addRow(new Object[]{
                     id, nama, qty, harga, subJual
                 });
-
-                // Akumulasi ke Total Besar
                 totalBarang += qty;
                 totalUntung += untungItem;
             }
-
-            // TAMPILKAN TOTAL KE TEXTFIELD
             txtTotalItem.setText(String.valueOf(totalBarang));
             txtKeuntungan.setText("Rp " + (int)totalUntung);
 

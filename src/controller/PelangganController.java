@@ -7,7 +7,7 @@ import connection.DBaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javax.swing.JOptionPane;
+
 /**
  *
  * @author LENOVO
@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 public class PelangganController {
     public String cariPelanggan(String idAtauNama) {
         Connection con = DBaseConnection.connect();
-        String namaPelanggan = "Umum"; // Default jika tidak ketemu
+        String namaPelanggan = "Umum";  
         
         try {
             String sql = "SELECT nama_pelanggan FROM pelanggan WHERE id_pelanggan = ? OR nama_pelanggan LIKE ?";
@@ -33,8 +33,8 @@ public class PelangganController {
         return namaPelanggan;
     }
     
-    // Tambah Pelanggan Baru (Jika ada form member)
+     
     public void tambahPelanggan(String nama, String noHp, String alamat) {
-        // ... Logika Insert ke tabel pelanggan ...
+         
     }
 }
