@@ -71,6 +71,7 @@ public class FormGuiEndDay extends javax.swing.JFrame {
         tutup = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("End Day");
 
         jPanel2.setBackground(new java.awt.Color(153, 0, 0));
 

@@ -58,6 +58,7 @@ public class FormLaporan extends javax.swing.JFrame {
         reset = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Laporan");
 
         jLabel1.setFont(new java.awt.Font("Poppins Black", 0, 36)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

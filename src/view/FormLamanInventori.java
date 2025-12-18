@@ -57,6 +57,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
         BtnMultiItem = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Inventory");
         setPreferredSize(new java.awt.Dimension(1000, 669));
 
         jPanel1.setBackground(new java.awt.Color(153, 153, 153));
@@ -123,7 +124,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
         });
 
         jLabel10.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
-        jLabel10.setText("Kategori");
+        jLabel10.setText("Supplier");
 
         Kategori.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
         Kategori.addActionListener(new java.awt.event.ActionListener() {
@@ -216,7 +217,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 994, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,7 +260,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
                             .addComponent(BtnKembali))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 913, Short.MAX_VALUE)
                         .addComponent(BtnSimpan)))
                 .addContainerGap())
         );
@@ -525,7 +526,7 @@ public class FormLamanInventori extends javax.swing.JFrame {
         Kategori.setText("");
         HargaBeli.setText("");
         HargaJual.setText("");
-         
+         // Kosongkan textfield, karena nanti ngisinya di TABEL
 
         KodeBarang.requestFocus();
     }//GEN-LAST:event_BtnMultiItemActionPerformed

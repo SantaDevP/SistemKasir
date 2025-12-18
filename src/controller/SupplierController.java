@@ -39,18 +39,5 @@ public class SupplierController {
     }
 
     
-    public void tambahSupplier(String nama, String telp, String alamat) {
-        Connection con = DBaseConnection.connect();
-        try {
-            String sql = "INSERT INTO supplier (nama_supplier, no_telp, alamat) VALUES (?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, nama);
-            ps.setString(2, telp);
-            ps.setString(3, alamat);
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Supplier Berhasil Ditambah");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Gagal Tambah: " + e.getMessage());
-        }
-    }
+    
 }

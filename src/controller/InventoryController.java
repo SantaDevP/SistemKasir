@@ -75,7 +75,7 @@ public class InventoryController {
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
                     rs.getString("nama_supplier"), // Muncul Huruf (misal: Makanan)
-                    "0"
+                    ""
                 });
             }
             tabel.setModel(model);
@@ -190,7 +190,7 @@ public class InventoryController {
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
                     rs.getString("nama_supplier"),
-                    "0"
+                    ""
                 });
             }
             tabel.setModel(model);
@@ -222,7 +222,7 @@ public class InventoryController {
                     rs.getInt("harga_jual"),
                     rs.getInt("stok"),
                     rs.getString("Kategori"),
-                    "0"
+                    ""
                 });
             }
         } catch (Exception e) {
@@ -230,43 +230,6 @@ public class InventoryController {
         }
     }
 
-     
-    public String cekAtauBuatKategori(String namaKategori) {
-        Connection con = DBaseConnection.connect();
-        try {
-             
-            String sqlCek = "SELECT id_supplier FROM supplier WHERE Kategori LIKE ?";
-            PreparedStatement psCek = con.prepareStatement(sqlCek);
-            psCek.setString(1, namaKategori);
-            ResultSet rs = psCek.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getString("id_supplier"); // Ada, kembalikan ID
-            } else {
-                 
-                Statement st = con.createStatement();
-                ResultSet rsMax = st.executeQuery("SELECT MAX(id_supplier) FROM supplier");
-                int idBaru = 1;
-                if (rsMax.next()) {
-                    idBaru = rsMax.getInt(1) + 1;
-                }
-                
-                String sqlInsert = "INSERT INTO supplier (id_supplier, nama_supplier, Kategori, alamat, no_telp, email_suplier) VALUES (?, ?, ?, '-', '-', '-')";
-                PreparedStatement psInsert = con.prepareStatement(sqlInsert);
-                psInsert.setInt(1, idBaru);
-                psInsert.setString(2, "Supplier " + namaKategori);
-                psInsert.setString(3, namaKategori);
-                psInsert.executeUpdate();
-                
-                return String.valueOf(idBaru);
-            }
-        } catch (Exception e) {
-            System.out.println("Error Kategori: " + e.getMessage());
-            return "0";
-        }
-    }
-
-     
     public boolean cekApakahBarangAda(String id) {
         Connection con = DBaseConnection.connect();
         try {
