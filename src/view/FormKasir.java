@@ -12,7 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.product;
 import model.userSession;
-
+import java.awt.print.PrinterException;
+import javax.swing.JTextArea;
 /**
  *
  * @author Santa
@@ -47,6 +48,61 @@ public class FormKasir extends javax.swing.JFrame {
     
     kodeBarang.requestFocus();
 }
+    public void cetakStruk(String tunai, String kembalian) {
+        try {
+            StringBuilder struk = new StringBuilder();
+
+            // --- HEADER ---
+            struk.append("=====================================\n");
+            struk.append("           CLANDYS GROSIR           \n");
+            struk.append("      Jl. Singaraja - Seririt       \n");
+            struk.append("=====================================\n");
+
+            // Info Transaksi
+            struk.append("Tanggal : " + new java.util.Date() + "\n");
+            struk.append("Kasir   : " + namaKasir.getText() + "\n"); 
+            struk.append("No Trans: " + noTransaksi.getText() + "\n");
+            struk.append("-------------------------------------\n");
+
+            // --- ITEM BARANG ---
+            // Mengambil data dari variabel 'table' milik Tuanku
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) table.getModel();
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String nama = model.getValueAt(i, 1).toString(); // Kolom Nama
+                String harga = model.getValueAt(i, 2).toString();// Kolom Harga
+                String qty = model.getValueAt(i, 3).toString();  // Kolom Qty
+                String sub = model.getValueAt(i, 4).toString();  // Kolom Subtotal
+
+                // Format Struk:
+                // Nama Barang
+                //    Qty x Harga = Subtotal
+                struk.append(nama + "\n");
+                struk.append("   " + qty + " x " + harga + " = " + sub + "\n");
+            }
+
+            struk.append("-------------------------------------\n");
+
+            // --- FOOTER ---
+            struk.append("Total Belanja : " + jLabel7.getText() + "\n"); // Ambil dari Label Total
+            struk.append("Tunai         : Rp " + tunai + "\n");
+            struk.append("Kembali       : " + kembalian + "\n");
+            struk.append("=====================================\n");
+            struk.append("      TERIMA KASIH KUNJUNGANNYA      \n");
+            struk.append("=====================================\n\n\n");
+
+            // --- PRINTING ---
+            JTextArea printer = new JTextArea();
+            printer.setText(struk.toString());
+            printer.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 10));
+
+            printer.print(); // Print perintah sistem
+
+        } catch (PrinterException e) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Printer Error: " + e.getMessage());
+        }
+    }
+    
     public FormKasir() {
         initComponents();
         this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
@@ -642,26 +698,14 @@ public class FormKasir extends javax.swing.JFrame {
 
     private void selesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selesaiActionPerformed
         
-        try {
-       
-        model.transaksi t = new model.transaksi();
-        
-     
-        t.setId_transaksi(noTransaksi.getText());
-        
-      
-        java.util.Date tanggalDipilih = tglTransaksi    .getDate();
-        
-        if (tanggalDipilih == null) { tanggalDipilih = new java.util.Date(); }
-        
-        
+        try {       
+        model.transaksi t = new model.transaksi();             
+        t.setId_transaksi(noTransaksi.getText());             
+        java.util.Date tanggalDipilih = tglTransaksi    .getDate();       
+        if (tanggalDipilih == null) { tanggalDipilih = new java.util.Date(); }              
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        t.setTgl_transaksi(sdf.format(tanggalDipilih)); 
-        
-        
-        t.setId_pegawai(userSession.getId_pegawai());
-        
-        
+        t.setTgl_transaksi(sdf.format(tanggalDipilih));               
+        t.setId_pegawai(userSession.getId_pegawai());             
         int idCust = 1;
         try {
             idCust = Integer.parseInt(pelanggan.getText());
@@ -691,27 +735,36 @@ public class FormKasir extends javax.swing.JFrame {
         boolean sukses = transCtrl.simpanTransaksi(t, listDetail); 
         
         if (sukses) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Transaksi Berhasil! Kembalian: " + kembalian.getText());
- 
-            model.setRowCount(0);           
-            totalBelanja = 0;               
-            jLabel7.setText("0");           
-            bayar.setText("");
-            kembalian.setText("");
-            kodeBarang.setText("");
-            namaBarang.setText("");
-            kuantitas.setText("");
+            int tanya = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "Transaksi Berhasil! Cetak Struk?", 
+                "Cetak", 
+                javax.swing.JOptionPane.YES_NO_OPTION);
             
-            
-            noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
-            
-            
-            selesai.setEnabled(false);
-            
-            
-            kodeBarang.requestFocus();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Gagal Menyimpan ke Database!");
+            if (tanya == javax.swing.JOptionPane.YES_OPTION) {
+                // Ambil data uang untuk dikirim ke struk
+                String uangTunai = bayar.getText();
+                String uangKembali = kembalian.getText();
+                
+                // Panggil method cetak
+                cetakStruk(uangTunai, uangKembali);
+            }
+            // ------------------------------------
+
+                model.setRowCount(0);            
+                totalBelanja = 0;                
+                jLabel7.setText("0");            
+                bayar.setText("");
+                kembalian.setText("");
+                kodeBarang.setText("");
+                namaBarang.setText("");
+                kuantitas.setText("");
+
+                noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
+                selesai.setEnabled(false);
+                kodeBarang.requestFocus();
+
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Gagal Menyimpan ke Database!");
         }
         
     } catch (Exception e) {
