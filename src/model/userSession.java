@@ -9,19 +9,17 @@ package model;
  * @author Santa
  */
 public class userSession {
-    private static int id_pegawai;
+    private static String id_pegawai;
     private static String nama_pegawai;
 
     public userSession() {
     }
     
-    
-    
-    public static void setUserLogin(int id, String nama){
+    public static void setUserLogin(String id, String nama){
         id_pegawai = id;
         nama_pegawai = nama;
     }
-    public static int getId_pegawai(){
+    public static String getId_pegawai(){
         return id_pegawai;
     }
     public static String getNama_pegawai(){

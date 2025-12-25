@@ -10,27 +10,29 @@ package model;
  * @author Santa
  */
 public class product {
-    private int id_product;
+    private String id_product;
     private String nama_product;
     private double harga_jual;
+    private double harga_beli;
     private int stok;
+    private String supplier;
 
     // Constructor kosong
     public product() {}
 
     // Constructor dengan isi
-    public product(int id, String nama, double harga, int stok) {
+    public product(String id, String nama, double harga, int stok) {
         this.id_product = id;
         this.nama_product = nama;
         this.harga_jual = harga;
         this.stok = stok;
     }
 
-    public int getId_product() {
+    public String getId_product() {
         return id_product;
     }
 
-    public void setId_product(int id_product) {
+    public void setId_product(String id_product) {
         this.id_product = id_product;
     }
 
@@ -57,5 +59,13 @@ public class product {
     public void setStok(int stok) {
         this.stok = stok;
     }
+
     
+    public String getId_supplier() {
+        return supplier;
+    }
+
+    public void setId_supplier(String id_supplier) {
+        this.supplier = supplier;
+    }
 }

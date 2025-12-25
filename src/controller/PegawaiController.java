@@ -16,6 +16,10 @@ import javax.swing.table.DefaultTableModel;
  * @author LENOVO
  */
 public class PegawaiController {
+    
+    public String getIdOtomatis() {
+        return new TransaksiController().getAutoID("pegawai", "id_pegawai", "PEG-");
+    }
     public void tampilPegawai(JTable tabel) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = new DefaultTableModel();

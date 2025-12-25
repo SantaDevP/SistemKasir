@@ -6,7 +6,6 @@
 package view;
 import controller.ProductController;
 import controller.TransaksiController;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -44,7 +43,7 @@ public class FormKasir extends javax.swing.JFrame {
     
     
     noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
-    pelanggan.setText("1");
+    pelanggan.setText("CUST-001");
     
     kodeBarang.requestFocus();
 }
@@ -326,7 +325,7 @@ public class FormKasir extends javax.swing.JFrame {
         jLabel2.setText("ID Pelanggan");
 
         pelanggan.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
-        pelanggan.setText("1");
+        pelanggan.setText("CUST-001");
         pelanggan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pelangganActionPerformed(evt);
@@ -665,7 +664,7 @@ public class FormKasir extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
            
-            int id = Integer.parseInt(kodeBarang.getText());
+            String id = kodeBarang.getText(); // Langsung ambil String
             product p = prodCtrl.cariBarang(id);
             int qty = Integer.parseInt(kuantitas.getText());
             
@@ -698,75 +697,116 @@ public class FormKasir extends javax.swing.JFrame {
 
     private void selesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selesaiActionPerformed
         
-        try {       
-        model.transaksi t = new model.transaksi();             
-        t.setId_transaksi(noTransaksi.getText());             
-        java.util.Date tanggalDipilih = tglTransaksi    .getDate();       
-        if (tanggalDipilih == null) { tanggalDipilih = new java.util.Date(); }              
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        t.setTgl_transaksi(sdf.format(tanggalDipilih));               
-        t.setId_pegawai(userSession.getId_pegawai());             
-        int idCust = 1;
-        try {
-            idCust = Integer.parseInt(pelanggan.getText());
-        } catch (Exception e) {
-           
+        if (totalBelanja == 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Keranjang masih kosong!");
+        return;
+    }
+
+    // 2. CEK PEMBAYARAN
+    if (bayar.getText().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Masukkan jumlah uang bayar!");
+        bayar.requestFocus();
+        return;
+    }
+
+    try {
+        // Hitung Kembalian
+        double uangBayar = Double.parseDouble(bayar.getText());
+        double uangKembali = uangBayar - totalBelanja;
+
+        if (uangKembali < 0) {
+            kembalian.setText("Uang Kurang!");
+            kembalian.setForeground(java.awt.Color.RED);
+            javax.swing.JOptionPane.showMessageDialog(this, "Uang pembayaran kurang!");
+            return; // Berhenti di sini, jangan simpan
+        } else {
+            kembalian.setText("Rp " + (int)uangKembali);
+            kembalian.setForeground(java.awt.Color.BLACK);
         }
-        t.setId_customer(idCust);
+
+        // 3. SIAPKAN DATA TRANSAKSI (HEADER)
+        model.transaksi t = new model.transaksi();
+        t.setId_transaksi(noTransaksi.getText());
         
+        // Ambil Tanggal
+        java.util.Date tanggalDipilih = tglTransaksi.getDate();
+        if (tanggalDipilih == null) { tanggalDipilih = new java.util.Date(); }
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        t.setTgl_transaksi(sdf.format(tanggalDipilih));
         
+        // Ambil ID Pegawai (Pastikan UserSession sudah return String)
+        t.setId_pegawai(userSession.getId_pegawai());
+        
+        // --- [PERBAIKAN 1] ID CUSTOMER (STRING) ---
+        // Tidak ada lagi Integer.parseInt di sini
+        String idCust = pelanggan.getText();
+        if (idCust == null || idCust.isEmpty()) {
+            idCust = "CUST-001"; // Default ID Umum
+        }
+        t.setId_customer(idCust); 
         t.setTotal_belanja(totalBelanja);
+
+        // 4. SIAPKAN DATA DETAIL (BARANG)
         java.util.ArrayList<model.detailTransaksi> listDetail = new java.util.ArrayList<>();
-        
         
         for (int i = 0; i < table.getRowCount(); i++) {
             model.detailTransaksi d = new model.detailTransaksi();
-            int idProduk = Integer.parseInt(table.getValueAt(i, 0).toString());
+            
+            // --- [PERBAIKAN 2] ID PRODUK (STRING) ---
+            // Ambil langsung sebagai String, HAPUS Integer.parseInt
+            String idProduk = table.getValueAt(i, 0).toString();
+            d.setId_product(idProduk);
+            
+            // Ambil Qty & Subtotal (Ini tetap Angka)
             int qty = Integer.parseInt(table.getValueAt(i, 3).toString());
             double subtotal = Double.parseDouble(table.getValueAt(i, 4).toString());
             
-            d.setId_product(idProduk);
             d.setQuantity(qty);
             d.setSubtotal((int)subtotal);
             
-            
             listDetail.add(d);
         }
-        boolean sukses = transCtrl.simpanTransaksi(t, listDetail); 
+
+        // 5. SIMPAN KE DATABASE
+        boolean sukses = transCtrl.simpanTransaksi(t, listDetail);
         
         if (sukses) {
+            // 6. KONFIRMASI CETAK STRUK
             int tanya = javax.swing.JOptionPane.showConfirmDialog(this, 
                 "Transaksi Berhasil! Cetak Struk?", 
                 "Cetak", 
                 javax.swing.JOptionPane.YES_NO_OPTION);
             
             if (tanya == javax.swing.JOptionPane.YES_OPTION) {
-                // Ambil data uang untuk dikirim ke struk
-                String uangTunai = bayar.getText();
-                String uangKembali = kembalian.getText();
-                
-                // Panggil method cetak
-                cetakStruk(uangTunai, uangKembali);
+                // Panggil method cetakStruk (yang tadi kita buat)
+                cetakStruk(bayar.getText(), kembalian.getText());
             }
-            // ------------------------------------
 
-                model.setRowCount(0);            
-                totalBelanja = 0;                
-                jLabel7.setText("0");            
-                bayar.setText("");
-                kembalian.setText("");
-                kodeBarang.setText("");
-                namaBarang.setText("");
-                kuantitas.setText("");
-
-                noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
-                selesai.setEnabled(false);
-                kodeBarang.requestFocus();
-
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Gagal Menyimpan ke Database!");
+            // 7. RESET FORM (BERSIH-BERSIH)
+            model.setRowCount(0);            
+            totalBelanja = 0;                
+            jLabel7.setText("0");            
+            bayar.setText("");
+            kembalian.setText("");
+            kodeBarang.setText("");
+            namaBarang.setText("");
+            kuantitas.setText("");
+            
+            // Generate Nomor Transaksi Baru
+            noTransaksi.setText(transCtrl.getNoTransaksiOtomatis());
+            
+            // Kembalikan Default Pelanggan
+            pelanggan.setText("CUST-001");
+            
+            selesai.setEnabled(false); // Matikan tombol selesai lagi
+            kodeBarang.requestFocus(); // Fokus balik ke input barang
+            
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Gagal Menyimpan ke Database!");
         }
-        
+
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Format Angka Salah: " + e.getMessage());
     } catch (Exception e) {
         System.out.println("Error Tombol Selesai: " + e.getMessage());
         e.printStackTrace();
@@ -805,37 +845,23 @@ public class FormKasir extends javax.swing.JFrame {
         // TODO add your handling code here:
         String kodeInput = kodeBarang.getText(); 
     
-    if (kodeInput.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Isi Kode Barang dulu!");
-        return;
-    }
-
-    try {
-        
-        int id = Integer.parseInt(kodeInput);
-        
-        
-        controller.ProductController prodCtrl = new controller.ProductController(); 
-        
-        model.product p = prodCtrl.cariBarang(id);
-        
-        
-        if (p != null) {
-            
-            namaBarang.setText(p.getNama_product());
-            
-            
-            kuantitas.requestFocus(); 
-            
-        } else {
-            
-            javax.swing.JOptionPane.showMessageDialog(this, "Barang tidak ditemukan!");
-            namaBarang.setText(""); 
-            kodeBarang.requestFocus();
+        if (kodeInput.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Isi Kode Barang dulu!");
+            return;
         }
+        model.product p = prodCtrl.cariBarang(kodeInput);
+
+    if (p != null) {
+        namaBarang.setText(p.getNama_product());
+        kuantitas.requestFocus(); 
         
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Kode Barang harus berupa angka!");
+    } else {
+        // --- BARANG TIDAK ADA ---
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Barang dengan kode " + kodeInput + " tidak ditemukan!");
+            
+        namaBarang.setText(""); // Kosongkan nama jika salah
+        kodeBarang.requestFocus(); // Fokus balik ke input kode
     }
     }//GEN-LAST:event_jButton1ActionPerformed
 

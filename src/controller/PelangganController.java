@@ -13,6 +13,9 @@ import java.sql.ResultSet;
  * @author LENOVO
  */
 public class PelangganController {
+    public String getIdOtomatis() {
+        return new TransaksiController().getAutoID("customer", "id_customer", "CUST-");
+    }
     public String cariPelanggan(String idAtauNama) {
         Connection con = DBaseConnection.connect();
         String namaPelanggan = "Umum";  

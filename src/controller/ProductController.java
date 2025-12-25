@@ -12,7 +12,6 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import model.product; // Import model
 
 /**
  *
@@ -20,28 +19,39 @@ import model.product; // Import model
  */
 public class ProductController {
 
-    
-public model.product cariBarang(int id) {
-    model.product p = null;
-    try {
-        java.sql.Connection con = connection.DBaseConnection.connect();
-        java.sql.Statement st = con.createStatement();
-        String sql = "SELECT * FROM product WHERE id_product=" + id;
-        java.sql.ResultSet rs = st.executeQuery(sql);
-        
-        if (rs.next()) {
-            p = new model.product();
-            p.setId_product(rs.getInt("id_product"));
-            p.setNama_product(rs.getString("nama_product"));
-            p.setHarga_jual(rs.getDouble("harga_jual"));
-            p.setStok(rs.getInt("stok"));
-        }
-    } catch (Exception e) {
-        System.out.println("Error Cari Barang: " + e.getMessage());
+    // 1. Method ID Otomatis (Sudah Benar)
+    public String getIdOtomatis() {
+        return new TransaksiController().getAutoID("product", "id_product", "BRG-");
     }
-    return p;
-}
- 
+
+    // 2. [PERBAIKAN] Method Cari Barang
+    public model.product cariBarang(String id) {
+        model.product p = null;
+        // Pakai ? biar aman untuk String
+        String sql = "SELECT * FROM product WHERE id_product = ?"; 
+        
+        try {
+            java.sql.Connection con = connection.DBaseConnection.connect();
+            java.sql.PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, id); // Set String
+            
+            java.sql.ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                p = new model.product();
+                p.setId_product(rs.getString("id_product"));
+                p.setNama_product(rs.getString("nama_product"));
+                p.setHarga_jual(rs.getDouble("harga_jual"));
+                p.setStok(rs.getInt("stok"));
+                // Tambahan: Ambil ID Supplier juga (biar lengkap)
+                p.setId_supplier(rs.getString("id_supplier")); 
+            }
+        } catch (Exception e) {
+            System.out.println("Error Cari Barang: " + e.getMessage());
+        }
+        return p;
+    }
+        
     public void tampilkanData(JTable tabel, String cari) {
         Connection con = DBaseConnection.connect();
         DefaultTableModel model = new DefaultTableModel();
@@ -57,7 +67,6 @@ public model.product cariBarang(int id) {
             if (cari == null || cari.equals("")) {
                 sql = "SELECT * FROM product";
             } else {
-        
                 sql = "SELECT * FROM product WHERE id_product LIKE '%" + cari + "%' OR nama_product LIKE '%" + cari + "%'";
             }
 
@@ -69,7 +78,7 @@ public model.product cariBarang(int id) {
                     rs.getString("id_product"),
                     rs.getString("nama_product"),
                     rs.getInt("stok"),
-                    rs.getDouble("harga_jual") // Ambil sebagai Double (karena uang)
+                    rs.getDouble("harga_jual")
                 });
             }
             tabel.setModel(model);
@@ -79,8 +88,8 @@ public model.product cariBarang(int id) {
         }
     }
 
- 
-    public void tambahBarang(String id, String nama, int stok, double harga, int idSupplier) {
+    // 3. [PERBAIKAN] Parameter idSupplier jadi String!
+    public void tambahBarang(String id, String nama, int stok, double harga, String idSupplier) {
         Connection con = DBaseConnection.connect();
         try {
       
@@ -95,8 +104,10 @@ public model.product cariBarang(int id) {
             ps.setString(2, nama);
             ps.setInt(3, stok);
             ps.setDouble(4, harga);
-            ps.setDouble(5, harga * 0.8);  
-            ps.setInt(6, idSupplier);  
+            ps.setDouble(5, harga * 0.8);  // Harga beli otomatis 80%
+            
+            // [PERBAIKAN] Ubah setInt jadi setString
+            ps.setString(6, idSupplier);  
             
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan!");
@@ -150,6 +161,7 @@ public model.product cariBarang(int id) {
     private boolean cekIdAda(String id) {
         Connection con = DBaseConnection.connect();
         try {
+            // Ini sudah benar pakai kutip satu manual ('id')
             String sql = "SELECT * FROM product WHERE id_product = '" + id + "'";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);

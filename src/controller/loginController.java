@@ -29,7 +29,7 @@ public class loginController {
             
             if (rs.next()) {
                  
-                int id = rs.getInt("id_pegawai");
+                String id = rs.getString("id_pegawai");
                 String nama = rs.getString("nama_pegawai");
                 userSession.setUserLogin(id, nama);
                 

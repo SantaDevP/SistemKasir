@@ -12,7 +12,30 @@ import model.detailTransaksi;
 
 public class TransaksiController {
 
-     
+        public String getAutoID(String namaTabel, String namaKolomID, String awalan) {
+        String idBaru = awalan + "001";
+        try {
+            java.sql.Connection con = connection.DBaseConnection.connect();
+            java.sql.Statement st = con.createStatement();
+            String sql = "SELECT " + namaKolomID + " FROM " + namaTabel + " ORDER BY " + namaKolomID + " DESC LIMIT 1";
+            java.sql.ResultSet rs = st.executeQuery(sql);
+
+            if (rs.next()) {
+                String idTerakhir = rs.getString(namaKolomID); // Contoh: BRG-005
+                int pjgAwalan = awalan.length(); // Panjang "BRG-" adalah 4
+
+                // Ambil angkanya: "005" -> 5
+                int angka = Integer.parseInt(idTerakhir.substring(pjgAwalan));
+                angka++; // Jadi 6
+
+                // Gabung lagi: "BRG-" + "006"
+                idBaru = awalan + String.format("%03d", angka);
+            }
+        } catch (Exception e) {
+            System.out.println("Error Auto Number " + namaTabel + ": " + e.getMessage());
+        }
+        return idBaru;
+    }
     public String getNoTransaksiOtomatis() {
         String idBaru = "TRX-001";  
         Connection con = DBaseConnection.connect();
@@ -53,8 +76,8 @@ public class TransaksiController {
             
             psTrans.setString(1, t.getId_transaksi());
             psTrans.setString(2, tglDB);
-            psTrans.setInt(3, t.getId_pegawai());
-            psTrans.setInt(4, t.getId_customer());
+            psTrans.setString(3, t.getId_pegawai());
+            psTrans.setString(4, t.getId_customer());
             psTrans.setDouble(5, t.getTotal_belanja());
             psTrans.executeUpdate();
   
@@ -67,13 +90,13 @@ public class TransaksiController {
             for (detailTransaksi d : listDetail) {
  
                 psDetail.setString(1, t.getId_transaksi());
-                psDetail.setInt(2, d.getId_product());
+                psDetail.setString(2, d.getId_product());
                 psDetail.setInt(3, d.getQuantity());
                 psDetail.setDouble(4, d.getSubtotal());
                 psDetail.executeUpdate();  
    
                 psStok.setInt(1, d.getQuantity());
-                psStok.setInt(2, d.getId_product());
+                psStok.setString(2, d.getId_product());
                 psStok.executeUpdate();
             }
          

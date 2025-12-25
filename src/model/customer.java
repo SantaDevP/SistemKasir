@@ -10,7 +10,7 @@ package model;
  * @author Santa
  */
 public class customer {
-    private int id_customer;
+    private String id_customer;
     private String nama_customer;
     private String alamat;
     private String no_telp;
@@ -18,18 +18,18 @@ public class customer {
     public customer(){
         
     }
-    public customer(int id, String nama, String alamat, String telp){
+    public customer(String id, String nama, String alamat, String telp){
         this.id_customer = id;
         this.nama_customer = nama;
         this.alamat = alamat;
         this.no_telp = telp;
     }
 
-    public int getId_customer() {
+    public String getId_customer() {
         return id_customer;
     }
 
-    public void setId_customer(int id_customer) {
+    public void setId_customer(String id_customer) {
         this.id_customer = id_customer;
     }
 

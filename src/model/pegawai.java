@@ -10,7 +10,7 @@ package model;
  * @author Santa
  */
 public class pegawai {
-    private int id_pegawai;
+    private String id_pegawai;
     private String nama_pegawai;
     private String username;
     private String password;
@@ -18,17 +18,17 @@ public class pegawai {
     public pegawai(){
         
     }
-    public pegawai(int id, String nama, String username, String pass){
+    public pegawai(String id, String nama, String username, String pass){
         this.id_pegawai = id;
         this.nama_pegawai = nama;
         this.password = pass;
         this.username = username;
     }
     
-    public int getId_pegawai(){
+    public String getId_pegawai(){
         return id_pegawai;
     }
-    public void setId_pegawai(int id_pegawai){
+    public void setId_pegawai(String id_pegawai){
         this.id_pegawai = id_pegawai;
     }
     public String getNama_pegawai(){

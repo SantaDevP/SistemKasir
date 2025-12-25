@@ -11,11 +11,11 @@ package model;
 public class detailTransaksi {
     private int id_detail;
     private String id_transaksi;
-    private int id_product;
+    private String id_product;
     private int quantity;
     private int subtotal;
 
-    public detailTransaksi(int id_detail, String id_transaksi, int id_product, int quantity, int subtotal) {
+    public detailTransaksi(int id_detail, String id_transaksi, String id_product, int quantity, int subtotal) {
         this.id_detail = id_detail;
         this.id_transaksi = id_transaksi;
         this.id_product = id_product;
@@ -43,11 +43,11 @@ public class detailTransaksi {
         this.id_transaksi = id_transaksi;
     }
 
-    public int getId_product() {
+    public String getId_product() {
         return id_product;
     }
 
-    public void setId_product(int id_product) {
+    public void setId_product(String id_product) {
         this.id_product = id_product;
     }
 

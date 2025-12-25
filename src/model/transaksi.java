@@ -11,14 +11,14 @@ package model;
 public class transaksi {
     private String id_transaksi;
     private String tgl_transaksi;
-    private int id_pegawai;
-    private int id_customer;
+    private String id_pegawai;
+    private String id_customer;
     private double total_belanja;
 
     public transaksi() {
     }
 
-    public transaksi(String id_transaksi, String tgl_transaksi, int id_pegawai, int id_customer, double total_belanja) {
+    public transaksi(String id_transaksi, String tgl_transaksi, String id_pegawai, String id_customer, double total_belanja) {
         this.id_transaksi = id_transaksi;
         this.tgl_transaksi = tgl_transaksi;
         this.id_pegawai = id_pegawai;
@@ -42,19 +42,19 @@ public class transaksi {
         this.tgl_transaksi = tgl_transaksi;
     }
 
-    public int getId_pegawai() {
+    public String getId_pegawai() {
         return id_pegawai;
     }
 
-    public void setId_pegawai(int id_pegawai) {
+    public void setId_pegawai(String id_pegawai) {
         this.id_pegawai = id_pegawai;
     }
 
-    public int getId_customer() {
+    public String getId_customer() {
         return id_customer;
     }
 
-    public void setId_customer(int id_customer) {
+    public void setId_customer(String id_customer) {
         this.id_customer = id_customer;
     }
 
